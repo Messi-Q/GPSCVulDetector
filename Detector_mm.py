@@ -55,7 +55,10 @@ def Decoder(code, graph_train, pattern1=None, pattern2=None, pattern3=None, patt
     vecvalue = originalvec.numpy()
 
     value = np.hsplit(vecvalue, 4)
+    # get the vector of decoder
     graph_train_decoder, pattern1_decoder, pattern2_decoder, pattern3_decoder = value[0], value[1], value[2], value[3]
+
+    # TODO: 输出权重
     enc4 = att([graph_train_decoder, graph_train])
 
     return enc4
