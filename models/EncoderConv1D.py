@@ -46,7 +46,6 @@ class EncoderConv1D:
     """
     Training model
     """
-
     def train(self):
         # 创建一个实例history
         # history = LossHistory()
@@ -58,8 +57,8 @@ class EncoderConv1D:
     """
     Testing model
     """
-
     def test(self):
+        # self.model.load_weights("_model.pkl")
         values = self.model.evaluate([self.graph_test, self.pattern_test], self.y_test, batch_size=self.batch_size)
         print("Loss: ", values[0], "Accuracy: ", values[1])
         predictions = (self.model.predict([self.graph_test, self.pattern_test], batch_size=self.batch_size).round())
