@@ -7,6 +7,12 @@ from models.loss_draw import LossHistory
 
 args = parameter_parser()
 
+"""
+The graph feature and all the pattern feature are fed intto the fully-connected layer to get the weight parameter;
+Then, the graph feature that multiples the graph weight merged with the pattern features multiple the pattern weight;
+Finally, output the final prediction result and the weights of graph and patterns
+"""
+
 
 class EncoderWeight:
     def __init__(self, graph_train, graph_test, pattern1train, pattern2train, pattern3train, pattern1test, pattern2test,
@@ -56,23 +62,21 @@ class EncoderWeight:
         self.model = model
 
     """
-        Training model
+    Training model
     """
-
     def train(self):
         # 创建一个实例history
         # history = LossHistory()
-        train_history = self.model.fit([self.graph_train, self.pattern1train, self.pattern2train, self.pattern3train], self.y_train,
-                       batch_size=self.batch_size, epochs=self.epochs, class_weight=self.class_weight,
-                       validation_split=0.2, verbose=2)
+        train_history = self.model.fit([self.graph_train, self.pattern1train, self.pattern2train, self.pattern3train],
+                                       self.y_train, batch_size=self.batch_size, epochs=self.epochs,
+                                       class_weight=self.class_weight, validation_split=0.2, verbose=2)
         print(str(train_history.history))
         # self.model.save_weights("model.pkl")
         # history.loss_plot('epoch')
 
     """
-       Testing model
+    Testing model
     """
-
     def test(self):
         # self.model.load_weights("_model.pkl")
         values = self.model.evaluate([self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test],
@@ -86,7 +90,8 @@ class EncoderWeight:
         print(graphweight_output)
 
         # pattern1weight
-        pattern1weight = tf.keras.Model(inputs=self.model.input, outputs=self.model.get_layer('outputpattern1weight').output)
+        pattern1weight = tf.keras.Model(inputs=self.model.input,
+                                        outputs=self.model.get_layer('outputpattern1weight').output)
         pattern1weight_output = pattern1weight.predict(
             [self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test])
         print(pattern1weight_output)
@@ -105,6 +110,7 @@ class EncoderWeight:
             [self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test])
         print(pattern3weight_output)
 
+        # predictions
         predictions = (self.model.predict([self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test],
                                           batch_size=self.batch_size).round())
 

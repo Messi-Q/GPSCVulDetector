@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 
 def show_train_history(train_history, train, validation):
     """
-    显示训练过程
+    show the training process
 
-    参数：
-        train_history - 训练结果存储的参数位置
-        train - 训练数据的执行结果
-        validation - 验证数据的执行结果
+    parameter：
+        train_history: the trained parameter
+        train: training result
+        validation: validation result
     """
     plt.plot(train_history.history[train])
     plt.plot(train_history.history[validation])

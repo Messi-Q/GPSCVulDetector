@@ -1,12 +1,15 @@
 from __future__ import print_function
 from parser import parameter_parser
 import tensorflow as tf
-import numpy as np
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix
 from models.loss_draw import LossHistory
 
 args = parameter_parser()
+
+"""
+Add the attention mechanism for graph feature and pattern feature
+"""
 
 
 class EncoderAttention:
@@ -54,9 +57,8 @@ class EncoderAttention:
         self.model = model
 
     """
-        Training model
+    Training model
     """
-
     def train(self):
         # 创建一个实例history
         # history = LossHistory()
@@ -67,15 +69,15 @@ class EncoderAttention:
         # history.loss_plot('epoch')
 
     """
-       Testing model
+    Testing model
     """
-
     def test(self):
         # self.model.load_weights("_model.pkl")
         values = self.model.evaluate([self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test],
                                      self.y_test, batch_size=self.batch_size, verbose=1)
         print("Loss: ", values[0], "Accuracy: ", values[1])
 
+        # predictions
         predictions = (self.model.predict([self.graph_test, self.pattern1test, self.pattern2test, self.pattern3test],
                                           batch_size=self.batch_size).round())
 

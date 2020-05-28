@@ -295,7 +295,7 @@ if __name__ == "__main__":
     pattern4 = [0, 0, 0, 1]
 
     label1 = None
-    test_contract = "../data/infinite_loop/loopwhile77.c"
+    test_contract = "../data/loops/loopwhile77.c"
     pattern_list = extract_pattern(test_contract)
     if len(pattern_list) == 4:
         if sum(pattern_list) == 0:
@@ -311,10 +311,10 @@ if __name__ == "__main__":
     pattern4.append(pattern_list[3])
 
     label = None
-    inputFileDir = "../data/infinite_loop/"
-    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/infinite_loop/"
-    outputfeatureFCDir = "../pattern_feature/feature_by_fc/infinite_loop/"
-    outputlabelDir = "../pattern_feature/label_by_extractor/infinite_loop/"
+    inputFileDir = "../data/loops/"
+    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/loops/"
+    outputfeatureFCDir = "../pattern_feature/feature_by_fc/loops/"
+    outputlabelDir = "../pattern_feature/label_by_extractor/loops/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
         pattern1 = [1, 0, 0, 0]

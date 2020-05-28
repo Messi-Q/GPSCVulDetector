@@ -12,9 +12,10 @@ def main():
     graph_train, graph_test, graph_experts_train, graph_experts_test = get_graph_feature()
     pattern_train, pattern_test = get_pattern_feature()
 
-    graph_train = np.array(graph_train)
-    graph_test = np.array(graph_test)
+    graph_train = np.array(graph_train)  # The training set of graph feature
+    graph_test = np.array(graph_test)  # The testing set of graph feature
 
+    # The training set of patterns' feature
     pattern1train = []
     pattern2train = []
     pattern3train = []
@@ -24,6 +25,7 @@ def main():
         pattern2train.append([pattern_train[i][1]])
         pattern3train.append([pattern_train[i][2]])
 
+    # The testing set of patterns' feature
     pattern1test = []
     pattern2test = []
     pattern3test = []
@@ -36,11 +38,13 @@ def main():
     pattern_train = np.array(pattern_train)
     pattern_test = np.array(pattern_test)
 
+    # The ground truth label of certain contract in training set
     y_train = []
     for i in range(len(graph_experts_train)):
         y_train.append(int(graph_experts_train[i]))
     y_train = np.array(y_train)
 
+    # The label of certain contract in testing set
     y_test = []
     for i in range(len(graph_experts_test)):
         y_test.append(int(graph_experts_test[i]))
@@ -56,8 +60,8 @@ def main():
         model = EncoderAttention(graph_train, graph_test, np.array(pattern1train), np.array(pattern2train),
                               np.array(pattern3train), np.array(pattern1test), np.array(pattern2test),
                               np.array(pattern3test), y_train, y_test)
-    model.train()
-    model.test()
+    model.train()  # training
+    model.test()  # testing
 
 
 if __name__ == "__main__":
