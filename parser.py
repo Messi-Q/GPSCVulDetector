@@ -6,7 +6,7 @@ def parameter_parser():
     parser = argparse.ArgumentParser(description='Smart Contracts Vulnerability Detection')
 
     parser.add_argument('-D', '--dataset', type=str, default='', choices=[])
-    parser.add_argument('-M', '--model', type=str, default='EncoderWeight',
+    parser.add_argument('-M', '--model', type=str, default='EncoderConv1D',
                         choices=['EncoderConv1D', 'EncoderWeight', 'EncoderAttention'])
     parser.add_argument('--lr', type=float, default=0.002, help='learning rate')
     parser.add_argument('-d', '--dropout', type=float, default=0.2, help='dropout rate')

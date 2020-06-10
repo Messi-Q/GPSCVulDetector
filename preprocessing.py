@@ -87,8 +87,3 @@ if __name__ == "__main__":
     pattern_train, pattern_test = get_pattern_feature()
     print()
 
-    # for i in range(len(graph_feature_train)):
-    #     final_pattern_feature_train[i].insert(0, graph_feature_train[i])
-    #
-    # for i in range(len(graph_feature_test)):
-    #     final_pattern_feature_test[i].insert(0, graph_feature_test[i])

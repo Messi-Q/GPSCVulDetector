@@ -60,7 +60,7 @@ class EncoderAttention:
     Training model
     """
     def train(self):
-        # 创建一个实例history
+        # create the history instance
         # history = LossHistory()
         self.model.fit([self.graph_train, self.pattern1train, self.pattern2train, self.pattern3train], self.y_train,
                        batch_size=self.batch_size, epochs=self.epochs, class_weight=self.class_weight,

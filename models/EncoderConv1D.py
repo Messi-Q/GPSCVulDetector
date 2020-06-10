@@ -38,7 +38,7 @@ class EncoderConv1D:
             input2)
         pattern_train = tf.keras.layers.MaxPool1D(pool_size=3, strides=3)(pattern_train)
 
-        mergevec = tf.keras.layers.concatenate([graph_train, pattern_train])
+        mergevec = tf.keras.layers.Concatenate()([graph_train, pattern_train])
         mergevec = tf.keras.layers.Dense(50, activation='relu')(mergevec)
         prediction = tf.keras.layers.Dense(1, activation='sigmoid', name='output')(mergevec)
 
@@ -53,7 +53,7 @@ class EncoderConv1D:
     Training model
     """
     def train(self):
-        # 创建一个实例history
+        # create the history instance
         # history = LossHistory()
         self.model.fit([self.graph_train, self.pattern_train], self.y_train, batch_size=self.batch_size,
                        epochs=self.epochs, class_weight=self.class_weight, validation_split=0.2, verbose=2)
