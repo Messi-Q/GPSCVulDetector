@@ -9,7 +9,7 @@ from models.loss_draw import LossHistory
 args = parameter_parser()
 
 """
-The graph feature and all the pattern feature are fed intto the fully-connected layer to get the weight parameter;
+The graph feature and all the pattern feature are fed into the fully-connected layer to get the weight parameter;
 Then, the graph feature that multiples the graph weight merged with the pattern features multiple the pattern weight;
 Finally, output the final prediction result and the weights of graph and patterns
 """

@@ -50,7 +50,7 @@ def main():
         y_test.append(int(graph_experts_test[i]))
     y_test = np.array(y_test)
 
-    if args.model == 'EncoderConv1D':
+    if args.model == 'EncoderConv1D':  # Conv layer and dense layer
         model = EncoderConv1D(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
     elif args.model == 'EncoderWeight':
         model = EncoderWeight(graph_train, graph_test, np.array(pattern1train), np.array(pattern2train),

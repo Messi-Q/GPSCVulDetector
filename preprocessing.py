@@ -29,17 +29,17 @@ def get_pattern_feature():
         final_pattern_feature_test.append(tmp_feature)
 
     #  labels of extractor definition
-    label_by_extractor_train = []
-    f_train_label_extractor = open(pattern_feature_train_label_path, 'r')
-    labels = f_train_label_extractor.readlines()
-    for label in labels:
-        label_by_extractor_train.append(label.strip('\n'))
+    # label_by_extractor_train = []
+    # f_train_label_extractor = open(pattern_feature_train_label_path, 'r')
+    # labels = f_train_label_extractor.readlines()
+    # for label in labels:
+    #     label_by_extractor_train.append(label.strip('\n'))
 
-    label_by_extractor_valid = []
-    f_test_label_extractor = open(pattern_feature_test_label_path, 'r')
-    labels = f_test_label_extractor.readlines()
-    for label in labels:
-        label_by_extractor_valid.append(label.strip('\n'))
+    # label_by_extractor_valid = []
+    # f_test_label_extractor = open(pattern_feature_test_label_path, 'r')
+    # labels = f_test_label_extractor.readlines()
+    # for label in labels:
+    #     label_by_extractor_valid.append(label.strip('\n'))
 
     for i in range(len(final_pattern_feature_train)):
         final_pattern_feature_train[i] = final_pattern_feature_train[i].tolist()
@@ -51,10 +51,10 @@ def get_pattern_feature():
 
 
 def get_graph_feature():
-    graph_feature_train_data_path = "./graph_feature/reentrancy/reentrancy_no_model_final_train.txt"
+    graph_feature_train_data_path = "./graph_feature/reentrancy/reentrancy_final_train.txt"
     graph_feature_train_label_path = "./graph_feature/reentrancy/label_by_experts_train.txt"
 
-    graph_feature_test_data_path = "./graph_feature/reentrancy/reentrancy_no_model_final_valid.txt"
+    graph_feature_test_data_path = "./graph_feature/reentrancy/reentrancy_final_valid.txt"
     graph_feature_test_label_path = "./graph_feature/reentrancy/label_by_experts_valid.txt"
 
     #  labels of experts definition

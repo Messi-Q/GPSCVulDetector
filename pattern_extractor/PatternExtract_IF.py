@@ -4,6 +4,10 @@ import torch
 import numpy as np
 from Simple_FC import SimpleFC
 
+"""
+Here is the method for extracting security patterns of infinite loop.
+"""
+
 # function return type
 function_return_list = ['int8', 'int16', 'int32', 'int64', 'int128', 'int256', 'uint8', 'uint16', 'uint32', 'uint64',
                         'uint128', 'uint256', 'void', 'bool', 'string', 'address', "$_()", "_()"]

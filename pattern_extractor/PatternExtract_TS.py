@@ -4,6 +4,10 @@ import torch
 import numpy as np
 from Simple_FC import SimpleFC
 
+"""
+Here is the method for extracting security patterns of timestamp dependence.
+"""
+
 patterns = {"pattern1": 1, "pattern2": 2, "pattern3": 3}
 
 patterns_flag = {"100", "010", "001"}

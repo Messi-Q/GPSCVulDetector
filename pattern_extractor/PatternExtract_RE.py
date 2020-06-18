@@ -8,6 +8,10 @@ patterns = {"pattern1": 1, "pattern2": 2, "pattern3": 3}
 
 patterns_flag = {"100", "010", "001"}
 
+"""
+Here is the method for extracting security patterns of reentrancy.
+"""
+
 
 # split all functions of contracts
 def split_function(filepath):

@@ -9,11 +9,10 @@ args = parameter_parser()
 
 """
 The merged features (graph feature and pattern feature) are fed into the convolution and pooling layers
-This method is presented in our journal paper:
-Smart contract vulnerability detection using graph neural networks with security patterns
+This method is presented in our journal paper.
 """
 
-
+    
 class EncoderConv1D:
     def __init__(self, graph_train, graph_test, pattern_train, pattern_test, y_train, y_test,
                  batch_size=args.batch_size, lr=args.lr, epochs=args.epochs):

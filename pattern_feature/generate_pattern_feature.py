@@ -1,9 +1,9 @@
 import os
 import numpy as np
 
-test_total_name_path = "../graph_feature/reentrancy/contract_name_valid.txt"
-pattern_feature_path = "./feature_by_zeropadding/reentrancy/"
-label_path = "./label_by_extractor/reentrancy/"
+test_total_name_path = "../graph_feature/timestamp/contract_name_valid.txt"
+pattern_feature_path = "./feature_by_zeropadding/timestamp/"
+label_path = "./label_by_extractor/timestamp/"
 outputFinalFeature = "./feature_by_zeropadding/pattern_valid.txt"
 outputFinalLabelByExtractor = "./feature_by_zeropadding/label_by_extractor_valid.txt"
 final_pattern_feature = []

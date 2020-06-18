@@ -44,8 +44,12 @@ ${GPSCVulDetector}
     ├── feature_by_fc
     ├── feature_by_zeropadding
     └── label_by_extractor
-
 ```
+
+**Note:** 
+The graph feature of related smart contract is extracted by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) published on the IJCAI 2020.
+The pattern feature of related smart contract is extracted by the tools in the category `pattern_extractor`.  
+
 
 ## Running Project
 * To run program, use this command: python GPVulDetector.py.
