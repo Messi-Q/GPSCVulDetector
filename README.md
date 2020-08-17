@@ -62,5 +62,16 @@ python GPVulDetector.py --model EncoderWeight --lr 0.002 --dropout 0.2 --epochs 
 ```
 
 ## References
-1. Smart Contract Vulnerability Detection Using Graph Neural Networks. IJCAI 2020.
-[GNNSCVulDetector](https://github.com/Messi-Q/GNNSCVulDetector).
+1. Smart Contract Vulnerability Detection Using Graph Neural Networks. IJCAI 2020. [GNNSCVulDetector](https://github.com/Messi-Q/GNNSCVulDetector).
+```
+@inproceedings{ijcai2020-454,
+  title     = {Smart Contract Vulnerability Detection using Graph Neural Network},
+  author    = {Zhuang, Yuan and Liu, Zhenguang and Qian, Peng and Liu, Qi and Wang, Xiang and He, Qinming},
+  booktitle = {Proceedings of the Twenty-Ninth International Joint Conference on
+               Artificial Intelligence, {IJCAI-20}},
+  publisher = {International Joint Conferences on Artificial Intelligence Organization}, 
+  pages     = {3283--3290},
+  year      = {2020},
+}
+
+```
