@@ -52,13 +52,13 @@ The pattern feature of related smart contract is extracted by the tools in the c
 
 
 ## Running Project
-* To run program, use this command: python GPVulDetector.py.
+* To run program, use this command: python GPSCVulDetector.py.
 * Also, you can use specific hyper-parameters to train the model. All the hyper-parameters can be found in `parser.py`.
 
 Examples:
 ```shell
-python GPVulDetector.py
-python GPVulDetector.py --model EncoderWeight --lr 0.002 --dropout 0.2 --epochs 50 --batch_size 32
+python GPSCVulDetector.py
+python GPSCVulDetector.py --model EncoderConv1D --lr 0.002 --dropout 0.2 --epochs 50 --batch_size 32
 ```
 
 ## References
