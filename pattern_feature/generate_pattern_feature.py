@@ -2,10 +2,10 @@ import os
 import numpy as np
 
 test_total_name_path = "../graph_feature/timestamp/contract_name_valid.txt"
-pattern_feature_path = "./feature_by_zeropadding/timestamp/"
+pattern_feature_path = "./feature_zeropadding/timestamp/"
 label_path = "./label_by_extractor/timestamp/"
-outputFinalFeature = "./feature_by_zeropadding/pattern_valid.txt"
-outputFinalLabelByExtractor = "./feature_by_zeropadding/label_by_extractor_valid.txt"
+outputFinalFeature = "./feature_zeropadding/pattern_valid.txt"
+outputFinalLabelByExtractor = "./feature_zeropadding/label_by_extractor_valid.txt"
 final_pattern_feature = []
 
 f = open(test_total_name_path, 'r')

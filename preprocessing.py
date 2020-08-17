@@ -4,15 +4,15 @@ import numpy as np
 def get_pattern_feature():
     train_total_name_path = "./graph_feature/reentrancy/contract_name_train.txt"
     test_total_name_path = "./graph_feature/reentrancy/contract_name_valid.txt"
-    pattern_feature_path = "./pattern_feature/feature_by_zeropadding/reentrancy/"
+    pattern_feature_path = "./pattern_feature/feature_FNN/reentrancy/"
 
-    # pattern_feature_train_data_path = "./pattern_feature/feature_by_zeropadding/reentrancy_pattern_train.txt"
+    # pattern_feature_train_data_path = "./pattern_feature/feature_zeropadding/reentrancy_pattern_train.txt"
     final_pattern_feature_train = []  # pattern feature train
-    pattern_feature_train_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_train.txt"
+    pattern_feature_train_label_path = "./pattern_feature/feature_zeropadding/reentrancy/label_by_extractor_train.txt"
 
-    # pattern_feature_test_data_path = "../pattern_feature/feature_by_zeropadding/pattern_valid.txt"
+    # pattern_feature_test_data_path = "../pattern_feature/feature_zeropadding/pattern_valid.txt"
     final_pattern_feature_test = []  # pattern feature test
-    pattern_feature_test_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_valid.txt"
+    pattern_feature_test_label_path = "./pattern_feature/feature_zeropadding/reentrancy/label_by_extractor_valid.txt"
 
     f_train = open(train_total_name_path, 'r')
     lines = f_train.readlines()
@@ -28,18 +28,18 @@ def get_pattern_feature():
         tmp_feature = np.loadtxt(pattern_feature_path + line + '.txt')
         final_pattern_feature_test.append(tmp_feature)
 
-    #  labels of extractor definition
-    # label_by_extractor_train = []
-    # f_train_label_extractor = open(pattern_feature_train_label_path, 'r')
-    # labels = f_train_label_extractor.readlines()
-    # for label in labels:
-    #     label_by_extractor_train.append(label.strip('\n'))
+    # labels of extractor definition
+    label_by_extractor_train = []
+    f_train_label_extractor = open(pattern_feature_train_label_path, 'r')
+    labels = f_train_label_extractor.readlines()
+    for label in labels:
+        label_by_extractor_train.append(label.strip('\n'))
 
-    # label_by_extractor_valid = []
-    # f_test_label_extractor = open(pattern_feature_test_label_path, 'r')
-    # labels = f_test_label_extractor.readlines()
-    # for label in labels:
-    #     label_by_extractor_valid.append(label.strip('\n'))
+    label_by_extractor_valid = []
+    f_test_label_extractor = open(pattern_feature_test_label_path, 'r')
+    labels = f_test_label_extractor.readlines()
+    for label in labels:
+        label_by_extractor_valid.append(label.strip('\n'))
 
     for i in range(len(final_pattern_feature_train)):
         final_pattern_feature_train[i] = final_pattern_feature_train[i].tolist()
@@ -47,7 +47,7 @@ def get_pattern_feature():
     for i in range(len(final_pattern_feature_test)):
         final_pattern_feature_test[i] = final_pattern_feature_test[i].tolist()
 
-    return final_pattern_feature_train, final_pattern_feature_test
+    return final_pattern_feature_train, final_pattern_feature_test, label_by_extractor_train, label_by_extractor_valid
 
 
 def get_graph_feature():
@@ -84,6 +84,6 @@ def get_graph_feature():
 
 if __name__ == "__main__":
     graph_train, graph_test, graph_experts_train, graph_experts_test = get_graph_feature()
-    pattern_train, pattern_test = get_pattern_feature()
+    pattern_train, pattern_test, pattern_experts_train, pattern_experts_test = get_pattern_feature()
     print()
 

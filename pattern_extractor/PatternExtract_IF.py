@@ -2,7 +2,7 @@ import os
 import re
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
+from FNN_Training import SimpleFC
 
 """
 Here is the method for extracting security patterns of infinite loop.
@@ -316,8 +316,8 @@ if __name__ == "__main__":
 
     label = None
     inputFileDir = "../data/loops/"
-    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/loops/"
-    outputfeatureFCDir = "../pattern_feature/feature_by_fc/loops/"
+    outputfeatureDir = "../pattern_feature/feature_zeropadding/loops/"
+    outputfeatureFCDir = "../pattern_feature/feature_FNN/loops/"
     outputlabelDir = "../pattern_feature/label_by_extractor/loops/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:

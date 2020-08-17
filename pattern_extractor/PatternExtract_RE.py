@@ -2,7 +2,7 @@ import re
 import os
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
+from FNN_Training import SimpleFC
 
 patterns = {"pattern1": 1, "pattern2": 2, "pattern3": 3}
 
@@ -139,8 +139,8 @@ if __name__ == "__main__":
 
     label = None
     inputFileDir = "../data/reentrancy/"
-    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/reentrancy/"
-    outputfeatureFCDir = "../pattern_feature/feature_by_fc/reentrancy/"
+    outputfeatureDir = "../pattern_feature/feature_zeropadding/reentrancy/"
+    outputfeatureFCDir = "../pattern_feature/feature_FNN/reentrancy/"
     outputlabelDir = "../pattern_feature/label_by_extractor/reentrancy/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         pattern3.append(pattern_list[2])
 
         outputPathFC = outputfeatureFCDir + name + ".txt"
-        extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3)
+        # extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3)
 
         pattern1 = np.array(pattern1)
         pattern1 = np.array(np.pad(pattern1, (0, 246), 'constant'))

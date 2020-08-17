@@ -2,7 +2,7 @@ import os
 import re
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
+from FNN_Training import SimpleFC
 
 """
 Here is the method for extracting security patterns of timestamp dependence.
@@ -147,8 +147,8 @@ if __name__ == "__main__":
 
     label = None
     inputFileDir = "../data/timestamp/"
-    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/timestamp/"
-    outputfeatureFCDir = "../pattern_feature/feature_by_fc/timestamp/"
+    outputfeatureDir = "../pattern_feature/feature_zeropadding/timestamp/"
+    outputfeatureFCDir = "../pattern_feature/feature_FNN/timestamp/"
     outputlabelDir = "../pattern_feature/label_by_extractor/timestamp/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:

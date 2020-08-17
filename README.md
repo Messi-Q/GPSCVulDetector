@@ -1,7 +1,7 @@
 # GPSCVulDetector
 
-This repo is a python implementation of smart contract vulnerability detection of our TMP-SP. Here, we use
-graph neural networks with security patterns for smart contract vulnerability detection.
+This repo is a python implementation of smart contract vulnerability detection of our method (CEG). 
+Here, we explore using graph neural networks and expert knowledge for smart contract vulnerability detection.
 
 ## Requirements
 

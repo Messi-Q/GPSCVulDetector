@@ -3,6 +3,7 @@ from parser import parameter_parser
 from models.EncoderConv1D import EncoderConv1D
 from models.EncoderWeight import EncoderWeight
 from models.EncoderAttention import EncoderAttention
+from models.EncoderRNN import EncoderRNN
 from preprocessing import get_graph_feature, get_pattern_feature
 
 args = parameter_parser()
@@ -10,7 +11,7 @@ args = parameter_parser()
 
 def main():
     graph_train, graph_test, graph_experts_train, graph_experts_test = get_graph_feature()
-    pattern_train, pattern_test = get_pattern_feature()
+    pattern_train, pattern_test, label_by_extractor_train, label_by_extractor_valid = get_pattern_feature()
 
     graph_train = np.array(graph_train)  # The training set of graph feature
     graph_test = np.array(graph_test)  # The testing set of graph feature
@@ -24,6 +25,7 @@ def main():
         pattern1train.append([pattern_train[i][0]])
         pattern2train.append([pattern_train[i][1]])
         pattern3train.append([pattern_train[i][2]])
+        # pattern4train.append([pattern_train[i][3]])
 
     # The testing set of patterns' feature
     pattern1test = []
@@ -34,6 +36,7 @@ def main():
         pattern1test.append([pattern_test[i][0]])
         pattern2test.append([pattern_test[i][1]])
         pattern3test.append([pattern_test[i][2]])
+        # pattern4test.append([pattern_test[i][3]])
 
     pattern_train = np.array(pattern_train)
     pattern_test = np.array(pattern_test)
@@ -52,6 +55,8 @@ def main():
 
     if args.model == 'EncoderConv1D':  # Conv layer and dense layer
         model = EncoderConv1D(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
+    elif args.model == 'EncoderRNN':
+        model = EncoderRNN(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
     elif args.model == 'EncoderWeight':
         model = EncoderWeight(graph_train, graph_test, np.array(pattern1train), np.array(pattern2train),
                               np.array(pattern3train), np.array(pattern1test), np.array(pattern2test),
