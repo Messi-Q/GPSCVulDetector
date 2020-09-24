@@ -7,13 +7,13 @@ Here, we explore using graph neural networks and expert knowledge for smart cont
 
 ### Required Packages
 * **python**3 or above
-* **TensorFlow** 2.0 or above
+* **TensorFlow** 2.0
 * **sklearn** for model evaluation
 
 Run the following script to install the required packages.
 ```shell
 pip install --upgrade pip
-pip install --upgrade tensorflow
+pip install tensorflow==2.0
 pip install scikit-learn
 ```
 
