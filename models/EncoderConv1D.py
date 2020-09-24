@@ -55,8 +55,8 @@ class EncoderConv1D:
     def train(self):
         # create the history instance
         # history = LossHistory()
-        self.model.fit([self.pattern_train], self.y_train, batch_size=self.batch_size,
-                       epochs=self.epochs, class_weight=self.class_weight, validation_split=0.2, verbose=2)
+        self.model.fit([self.graph_train, self.pattern_train], self.y_train, batch_size=self.batch_size, epochs=self.epochs,
+                       class_weight=self.class_weight)
         # self.model.save_weights("model.pkl")
         # history.loss_plot('epoch')
 
@@ -66,10 +66,10 @@ class EncoderConv1D:
 
     def test(self):
         # self.model.load_weights("_model.pkl")
-        values = self.model.evaluate([self.pattern_test], self.y_test, batch_size=self.batch_size,
+        values = self.model.evaluate([self.graph_test, self.pattern_test], self.y_test, batch_size=self.batch_size,
                                      verbose=1)
         print("Loss: ", values[0], "Accuracy: ", values[1])
-        predictions = (self.model.predict([self.pattern_test], batch_size=self.batch_size).round())
+        predictions = (self.model.predict([self.graph_test, self.pattern_test], batch_size=self.batch_size).round())
         predictions = predictions.flatten()
 
         tn, fp, fn, tp = confusion_matrix(self.y_test, predictions).ravel()

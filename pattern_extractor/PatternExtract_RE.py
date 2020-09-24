@@ -2,7 +2,7 @@ import re
 import os
 import torch
 import numpy as np
-from FNN_Training import SimpleFC
+from Simple_FC import SimpleFC
 
 patterns = {"pattern1": 1, "pattern2": 2, "pattern3": 3}
 

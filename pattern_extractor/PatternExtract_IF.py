@@ -2,7 +2,7 @@ import os
 import re
 import torch
 import numpy as np
-from FNN_Training import SimpleFC
+from Simple_FC import SimpleFC
 
 """
 Here is the method for extracting security patterns of infinite loop.
