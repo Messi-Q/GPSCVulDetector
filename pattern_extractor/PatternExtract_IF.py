@@ -293,26 +293,26 @@ def extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3, pattern4
 
 
 if __name__ == "__main__":
-    pattern1 = [1, 0, 0, 0]
-    pattern2 = [0, 1, 0, 0]
-    pattern3 = [0, 0, 1, 0]
-    pattern4 = [0, 0, 0, 1]
-
-    label1 = None
-    test_contract = "../data/loops/loopwhile77.c"
-    pattern_list = extract_pattern(test_contract)
-    if len(pattern_list) == 4:
-        if sum(pattern_list) == 0:
-            label1 = 0
-        else:
-            label1 = 1
-    else:
-        print("The extracted patterns are error!")
-
-    pattern1.append(pattern_list[0])
-    pattern2.append(pattern_list[1])
-    pattern3.append(pattern_list[2])
-    pattern4.append(pattern_list[3])
+    # pattern1 = [1, 0, 0, 0]
+    # pattern2 = [0, 1, 0, 0]
+    # pattern3 = [0, 0, 1, 0]
+    # pattern4 = [0, 0, 0, 1]
+    #
+    # label1 = None
+    # test_contract = "../data/loops/loopwhile77.c"
+    # pattern_list = extract_pattern(test_contract)
+    # if len(pattern_list) == 4:
+    #     if sum(pattern_list) == 0:
+    #         label1 = 0
+    #     else:
+    #         label1 = 1
+    # else:
+    #     print("The extracted patterns are error!")
+    #
+    # pattern1.append(pattern_list[0])
+    # pattern2.append(pattern_list[1])
+    # pattern3.append(pattern_list[2])
+    # pattern4.append(pattern_list[3])
 
     label = None
     inputFileDir = "../data/loops/"

@@ -1,6 +1,7 @@
 import numpy as np
 from parser import parameter_parser
 from models.EncoderConv1D import EncoderConv1D
+from models.EncoderLSTM import EncoderLSTM
 from preprocessing import get_graph_feature, get_pattern_feature
 
 args = parameter_parser()
@@ -52,6 +53,8 @@ def main():
 
     if args.model == 'EncoderConv1D':  # Conv layer and dense layer
         model = EncoderConv1D(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
+    elif args.model == 'EncoderLSTM':  # Conv layer and dense layer
+        model = EncoderLSTM(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
 
     model.train()  # training
     model.test()  # testing
