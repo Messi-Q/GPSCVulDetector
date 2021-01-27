@@ -1,6 +1,6 @@
 # GPSCVulDetector
 
-This repo is a python implementation of smart contract vulnerability detection of our method (CEG). 
+This repo is a python implementation of smart contract vulnerability detection of our method (CGE). 
 Here, we explore using graph neural networks and expert knowledge for smart contract vulnerability detection.
 
 ## Requirements
@@ -19,7 +19,7 @@ pip install scikit-learn
 
 ### Dataset
 
-#### source code 
+#### Source code 
 Original smart contract source code:
 
 Ethereum smart contracts:  [Etherscan_contract](https://drive.google.com/open?id=1h9aFFSsL7mK4NmVJd4So7IJlFj9u0HRv)

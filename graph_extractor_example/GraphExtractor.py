@@ -1,30 +1,28 @@
+import os
 import re
+import time
 import numpy as np
 
-# keywords of solidity; immutable set
-keywords = frozenset(
-    {'bool', 'break', 'case', 'catch', 'const', 'continue', 'default', 'do', 'double', 'struct', 'else', 'enum',
-     'payable', 'function', 'modifier', 'emit', 'export', 'extern', 'false', 'constructor', 'float', 'if', 'contract',
-     'int', 'long', 'string', 'super', 'or', 'protected', 'return', 'returns', 'assert', 'event', 'indexed', 'using',
-     'require', 'uint', 'transfer', 'Transfer', 'Transaction', 'switch', 'pure', 'view', 'this', 'throw', 'true', 'try',
-     'revert', 'bytes', 'bytes4', 'bytes32', 'internal', 'external', 'union', 'constant', 'while', 'for', 'NULL',
-     'uint256', 'uint128', 'uint8', 'uint16', 'address', 'call', 'msg', 'sender', 'public', 'private', 'mapping'})
-
-# map user-defined variables to symbolic names
+# map user-defined variables to symbolic names(var)
 var_list = ['balances[msg.sender]', 'participated[msg.sender]', 'playerPendingWithdrawals[msg.sender]',
-            'tokens[msg.sender]', 'accountBalances[msg.sender]', 'creditedPoints[msg.sender]',
-            'balances[from]', 'balances[recipient]', 'claimedBonus[recipient]', 'Bal[msg.sender]',
-            'Accounts[msg.sender]', 'ExtractDepositTime[msg.sender]', 'Bids[msg.sender]',
-            'participated[msg.sender]', 'latestSeriesForUser[msg.sender]', 'payments[msg.sender]',
-            'rewardsForA[recipient]', 'userBalance[msg.sender]', 'credit[msg.sender]',
-            'credit[to]', 'userPendingWithdrawals[msg.sender]']
+            'nonces[msgSender]', 'balances[beneficiary]', 'transactions[transactionId]', 'tokens[token][msg.sender]',
+            'totalDeposited[token]', 'tokens[0][msg.sender]', 'accountBalances[msg.sender]', 'accountBalances[_to]',
+            'creditedPoints[msg.sender]', 'balances[from]', 'withdrawalCount[from]', 'balances[recipient]',
+            'investors[_to]', 'Bal[msg.sender]', 'Accounts[msg.sender]', 'Holders[_addr]', 'balances[_pd]',
+            'ExtractDepositTime[msg.sender]', 'Bids[msg.sender]', 'participated[msg.sender]', 'deposited[_participant]',
+            'Transactions[TransHash]', 'm_txs[_h]', 'balances[investor]', 'this.balance', 'proposals[_proposalID]',
+            'accountBalances[accountAddress]', 'Chargers[id]', 'latestSeriesForUser[msg.sender]',
+            'balanceOf[_addressToRefund]', 'tokenManage[token_]', 'milestones[_idMilestone]', 'payments[msg.sender]',
+            'rewardsForA[recipient]', 'userBalance[msg.sender]', 'credit[msg.sender]', 'credit[to]', 'round_[_rd]',
+            'userPendingWithdrawals[msg.sender]', '[msg.sender]', '[from]', '[to]', '[_to]', "msg.sender"]
 
 # function limit type
 function_limit = ['private', 'onlyOwner', 'internal', 'onlyGovernor', 'onlyCommittee', 'onlyAdmin', 'onlyPlayers',
-                  'onlyManager', 'onlyHuman', 'onlyCongressMembers', 'preventReentry', 'onlyMembers',
-                  'onlyProxyOwner', 'noReentrancy', 'notExecuted', 'noEther', 'notConfirmed']
+                  'onlyManager', 'onlyHuman', 'only_owner', 'onlyCongressMembers', 'preventReentry', 'onlyMembers',
+                  'onlyProxyOwner', 'ownerExists', 'noReentrancy', 'notExecuted', 'noReentrancy', 'noEther',
+                  'notConfirmed']
 
-# Boolean condition expression
+# Boolean condition expression:
 var_op_bool = ['!', '~', '**', '*', '!=', '<', '>', '<=', '>=', '==', '<<', '>>', '||', '&&']
 
 # Assignment expressions
@@ -51,93 +49,52 @@ def split_function(filepath):
     return function_list
 
 
-# locate the call.value (core node) to generate the contract graph (nodes and edges)
+# generate a potential fallback node
+def generate_potential_fallback_node(node_feature, edge_feature):
+    node_feature.append(["F", "F", "NoLimit", ["S"], 0, "MSG"])
+    edge_feature.append(["S", "F", "S", 0, "FW"])
+    edge_feature.append(["F", "W0", "F", 1, "FW"])
+    return node_feature, edge_feature
+
+
+# Position the call.value to generate the graph
 def generate_graph(filepath):
     allFunctionList = split_function(filepath)  # Store all functions
-    callValueList = []  # Store all core function that call the call.value
-    normalFunction = []  # Store a single normal node function that calls a core function
-    NormalFunctions = []  # Store all normal node functions that call core functions
-    coreFunctionNameList = []  # Store the core function name that calls call.value
-    otherFunctionList = []  # Store functions other than the core function
-    node_list = []  # Store all the nodes
-    edge_feature_list = []  # Store edge and edge features
-    node_feature_list = []  # Store node and node features
-    core_count = 0  # Number of core nodes 
-    normal_count = 0  # Number of normal nodes
-    params = []
+    callValueList = []  # Store all W functions that call call.value
+    cFunctionList = []  # Store a single C function that calls a W function
+    CFunctionLists = []  # Store all C functions that call W function
+    withdrawNameList = []  # Store the W function name that calls call.value
+    otherFunctionList = []  # Store functions other than W functions
+    node_list = []  # Store all the points
+    edge_list = []  # Store edge and edge features
+    node_feature_list = []  # Store nodes feature
+    params = []  # Store the parameters of the W functions
     param = []
+    key_count = 0  # Number of core nodes S and W
+    c_count = 0  # Number of core nodes C
 
     # ======================================================================
     # ---------------------------  Handle nodes  ----------------------------
     # ======================================================================
-    # Traverse all functions, store the function to invoke the call.value and other functions
+
+    # Store functions other than W functions
     for i in range(len(allFunctionList)):
         flag = 0
         for j in range(len(allFunctionList[i])):
             text = allFunctionList[i][j]
             if '.call.value' in text:
-                callValueList.append(allFunctionList[i])
                 flag += 1
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
 
-    # call.value as the core node and the function as the core node
-    for i in range(len(callValueList)):
-        # get the function name and params. function withdraw(uint amount) public
-        tmp = re.compile(r'\b([_A-Za-z]\w*)\b(?:(?=\s*\w+\()|(?!\s*\w+))')
-        resultFunction = tmp.findall(callValueList[i][0])
-        functionNameTmp = resultFunction[1]
-        if functionNameTmp == "payable":
-            functionName = functionNameTmp
-        else:
-            functionName = functionNameTmp + "("
-        coreFunctionNameList.append(functionName)
-
-        functionSentence = callValueList[i][0]
-        matchingRule = re.compile(r'[(](.*?)[)]', re.S)
-        resultParams = re.findall(matchingRule, functionSentence)
-        variables = resultParams[0].split(",")
-        for n in range(len(variables)):
-            params.append([variables[n].strip().split(" ")[-1]])
-
-        # Handling the core function access restrictions
-        limit_count = 0
-        limitFlag = None
-        for k in range(len(function_limit)):
-            if function_limit[k] in functionSentence:
-                limit_count += 1
-                limitFlag = "LimitedAC"
-        if limit_count == 0:
-            limitFlag = "NoLimit"
-
-        # traverse the call.value function and extract critical variables
-        for j in range(1, len(callValueList[i])):
-            node_list.append("C" + str(core_count))
-            core_count += 1
-            text = callValueList[i][j]
-
-            if '.call.value' in text:
-                node_list.append("C" + str(core_count))
-
-            else:
-                varList = []
-                tmp = re.compile("[a-z|\'\.\[\]]+", re.I)
-                allVarlist = re.findall(tmp, text)
-                for k in range(len(allVarlist)):
-                    if allVarlist[i] not in keywords:
-                        varList.append(allVarlist[i])
-
-
-
-    # Traverse all functions, construct core node and normal node
+    # Traverse all functions, find the call.value keyword, store the S and W nodes
     for i in range(len(allFunctionList)):
         for j in range(len(allFunctionList[i])):
             text = allFunctionList[i][j]
             if '.call.value' in text:
-                node_list.append("C" + str(core_count))
-                core_count += 1
-                node_list.append("C" + str(core_count))
-                callValueList.append([allFunctionList[i], "S", "W" + str(core_count)])
+                node_list.append("S")
+                node_list.append("W" + str(key_count))
+                callValueList.append([allFunctionList[i], "S", "W" + str(key_count)])
 
                 # get the function name and params
                 ss = allFunctionList[i][0]
@@ -148,28 +105,28 @@ def generate_graph(filepath):
                 for n in range(len(result_params)):
                     param.append(result_params[n].strip().split(" ")[-1])
 
-                params.append([param, "S", "W" + str(core_count)])
+                params.append([param, "S", "W" + str(key_count)])
 
                 # Handling W function access restrictions, which can be used for access restriction properties
                 # default that there are C nodes
                 limit_count = 0
                 for k in range(len(function_limit)):
-                    if function_limit[k] in callValueList[core_count][0][0]:
+                    if function_limit[k] in callValueList[key_count][0][0]:
                         limit_count += 1
                         if "address" in text:
                             node_feature_list.append(
-                                ["S", "S", "LimitedAC", ["W" + str(core_count)],
+                                ["S", "S", "LimitedAC", ["W" + str(key_count)],
                                  2, "INNADD"])
                             node_feature_list.append(
-                                ["W" + str(core_count), "W" + str(core_count), "LimitedAC", [],
+                                ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
                                  1, "NULL"])
                             break
                         elif "msg.sender" in text:
                             node_feature_list.append(
-                                ["S", "S", "LimitedAC", ["W" + str(core_count)],
+                                ["S", "S", "LimitedAC", ["W" + str(key_count)],
                                  2, "MSG"])
                             node_feature_list.append(
-                                ["W" + str(core_count), "W" + str(core_count), "LimitedAC", [],
+                                ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
                                  1, "NULL"])
                             break
                         else:
@@ -179,34 +136,34 @@ def generate_graph(filepath):
                                     param_count += 1
                                     node_feature_list.append(
                                         ["S", "S", "LimitedAC",
-                                         ["W" + str(core_count)],
+                                         ["W" + str(key_count)],
                                          2, "MSG"])
                                     node_feature_list.append(
-                                        ["W" + str(core_count), "W" + str(core_count), "LimitedAC", [],
+                                        ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
                                          1, "NULL"])
                                     break
                             if param_count == 0:
                                 node_feature_list.append(
-                                    ["S", "S", "LimitedAC", ["W" + str(core_count)],
+                                    ["S", "S", "LimitedAC", ["W" + str(key_count)],
                                      2, "INNADD"])
                                 node_feature_list.append(
-                                    ["W" + str(core_count), "W" + str(core_count), "LimitedAC", [],
+                                    ["W" + str(key_count), "W" + str(key_count), "LimitedAC", [],
                                      1, "NULL"])
                             break
                 if limit_count == 0:
                     if "address" in text:
                         node_feature_list.append(
-                            ["S", "S", "NoLimit", ["W" + str(core_count)],
+                            ["S", "S", "NoLimit", ["W" + str(key_count)],
                              2, "INNADD"])
                         node_feature_list.append(
-                            ["W" + str(core_count), "W" + str(core_count), "NoLimit", [],
+                            ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
                              1, "NULL"])
                     elif "msg.sender" in text:
                         node_feature_list.append(
-                            ["S", "S", "NoLimit", ["W" + str(core_count)],
+                            ["S", "S", "NoLimit", ["W" + str(key_count)],
                              2, "MSG"])
                         node_feature_list.append(
-                            ["W" + str(core_count), "W" + str(core_count), "NoLimit", [],
+                            ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
                              1, "NULL"])
                     else:
                         param_count = 0
@@ -214,18 +171,18 @@ def generate_graph(filepath):
                             if pa in text and pa != "":
                                 param_count += 1
                                 node_feature_list.append(
-                                    ["S", "S", "NoLimit", ["W" + str(core_count)],
+                                    ["S", "S", "NoLimit", ["W" + str(key_count)],
                                      2, "MSG"])
                                 node_feature_list.append(
-                                    ["W" + str(core_count), "W" + str(core_count), "NoLimit", [],
+                                    ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
                                      1, "NULL"])
                                 break
                         if param_count == 0:
                             node_feature_list.append(
-                                ["S", "S", "NoLimit", ["W" + str(core_count)],
+                                ["S", "S", "NoLimit", ["W" + str(key_count)],
                                  2, "INNADD"])
                             node_feature_list.append(
-                                ["W" + str(core_count), "W" + str(core_count), "NoLimit", [],
+                                ["W" + str(key_count), "W" + str(key_count), "NoLimit", [],
                                  1, "NULL"])
 
                 # For example: function transfer(address _to, uint _value, bytes _data, string _custom_fallback)
@@ -237,11 +194,11 @@ def generate_graph(filepath):
                     withdrawName = withdrawNameTmp
                 else:
                     withdrawName = withdrawNameTmp + "("
-                coreFunctionNameList.append(["W" + str(core_count), withdrawName])
+                withdrawNameList.append(["W" + str(key_count), withdrawName])
 
-                core_count += 1
+                key_count += 1
 
-    if core_count == 0:
+    if key_count == 0:
         print("Currently, there is no key word call.value")
         node_feature_list.append(["S", "S", "NoLimit", ["NULL"], 0, "NULL"])
         node_feature_list.append(["W0", "W0", "NoLimit", ["NULL"], 0, "NULL"])
@@ -249,9 +206,9 @@ def generate_graph(filepath):
     else:
         # Traverse all functions and find the C function nodes that calls the W function
         # (determine the function call by matching the number of arguments)
-        for k in range(len(coreFunctionNameList)):
-            w_key = coreFunctionNameList[k][0]
-            w_name = coreFunctionNameList[k][1]
+        for k in range(len(withdrawNameList)):
+            w_key = withdrawNameList[k][0]
+            w_name = withdrawNameList[k][1]
             for i in range(len(otherFunctionList)):
                 if len(otherFunctionList[i]) > 2:
                     for j in range(1, len(otherFunctionList[i])):
@@ -262,32 +219,30 @@ def generate_graph(filepath):
                             result_params = result[0].split(",")
 
                             if result_params[0] != "" and len(result_params) == len(params[k][0]):
-                                normalFunction += otherFunctionList[i]
-                                NormalFunctions.append(
-                                    [w_key, w_name, "C" + str(normal_count), otherFunctionList[i]])
-                                node_list.append("C" + str(normal_count))
+                                cFunctionList += otherFunctionList[i]
+                                CFunctionLists.append(
+                                    [w_key, w_name, "C" + str(c_count), otherFunctionList[i]])
+                                node_list.append("C" + str(c_count))
 
                                 for n in range(len(node_feature_list)):
                                     if w_key in node_feature_list[n][0]:
-                                        node_feature_list[n][3].append("C" + str(normal_count))
+                                        node_feature_list[n][3].append("C" + str(c_count))
 
                                 # Handling C function access restrictions
                                 limit_count = 0
                                 for m in range(len(function_limit)):
-                                    if function_limit[m] in normalFunction[0]:
+                                    if function_limit[m] in cFunctionList[0]:
                                         limit_count += 1
                                         node_feature_list.append(
-                                            ["C" + str(normal_count), "C" + str(normal_count), "LimitedAC", ["NULL"], 0,
-                                             "NULL"])
+                                            ["C" + str(c_count), "C" + str(c_count), "LimitedAC", ["NULL"], 0, "NULL"])
                                         break
                                 if limit_count == 0:
                                     node_feature_list.append(
-                                        ["C" + str(normal_count), "C" + str(normal_count), "NoLimit", ["NULL"], 0,
-                                         "NULL"])
-                                normal_count += 1
+                                        ["C" + str(c_count), "C" + str(c_count), "NoLimit", ["NULL"], 0, "NULL"])
+                                c_count += 1
                                 break
 
-        if normal_count == 0:
+        if c_count == 0:
             print("There is no C node")
             node_list.append("C0")
             node_feature_list.append(["C0", "C0", "NoLimit", ["NULL"], 0, "NULL"])
@@ -320,26 +275,26 @@ def generate_graph(filepath):
 
                                 if len(var_w_name) == 0:
                                     if "assert" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][2], "VAR" + str(before_var_count), callValueList[i][2], 1,
                                              'AH'])
                                     elif "require" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][2], "VAR" + str(before_var_count), callValueList[i][2], 1,
                                              'RG'])
                                     elif j >= 1:
                                         if "if" in callValueList[i][0][j - 1]:
-                                            edge_feature_list.append(
+                                            edge_list.append(
                                                 [callValueList[i][2], "VAR" + str(before_var_count),
                                                  callValueList[i][2], 1,
                                                  'GN'])
                                         elif "for" in callValueList[i][0][j - 1]:
-                                            edge_feature_list.append(
+                                            edge_list.append(
                                                 [callValueList[i][2], "VAR" + str(before_var_count),
                                                  callValueList[i][2], 1,
                                                  'FOR'])
                                         elif "else" in callValueList[i][0][j - 1]:
-                                            edge_feature_list.append(
+                                            edge_list.append(
                                                 [callValueList[i][2], "VAR" + str(before_var_count),
                                                  callValueList[i][2], 1,
                                                  'GB'])
@@ -347,30 +302,30 @@ def generate_graph(filepath):
                                             if "if" and "throw" in callValueList[i][0][j] or "if" in \
                                                     callValueList[i][0][j] \
                                                     and "throw" in callValueList[i][0][j + 1]:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][2], "VAR" + str(before_var_count),
                                                      callValueList[i][2], 1, 'IT'])
                                             elif "if" and "revert" in callValueList[i][0][j] or "if" in \
                                                     callValueList[i][0][
                                                         j] and "revert" in callValueList[i][0][j + 1]:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][2], "VAR" + str(before_var_count),
                                                      callValueList[i][2], 1, 'RH'])
                                             elif "if" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][2], "VAR" + str(before_var_count),
                                                      callValueList[i][2], 1, 'IF'])
                                             else:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][2], "VAR" + str(before_var_count),
                                                      callValueList[i][2], 1, 'FW'])
                                         else:
-                                            edge_feature_list.append(
+                                            edge_list.append(
                                                 [callValueList[i][2], "VAR" + str(before_var_count),
                                                  callValueList[i][2], 1,
                                                  'FW'])
                                     else:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][2], "VAR" + str(before_var_count), callValueList[i][2], 1,
                                              'FW'])
 
@@ -473,31 +428,31 @@ def generate_graph(filepath):
                                     var_tmp.append("VAR" + str(after_var_count))
 
                                     if "assert" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'AH'])
                                     elif "require" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'RG'])
                                     elif "return" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'RE'])
                                     elif "if" and "throw" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'IT'])
                                     elif "if" and "revert" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'RH'])
                                     elif "if" in text:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'IF'])
                                     else:
-                                        edge_feature_list.append(
+                                        edge_list.append(
                                             [callValueList[i][1], "VAR" + str(after_var_count), callValueList[i][1], 3,
                                              'FW'])
 
@@ -533,37 +488,37 @@ def generate_graph(filepath):
                                         if var_list[k] == var_name[n]:
                                             var_count += 1
                                             if "assert" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'AH'])
                                             elif "require" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'RG'])
                                             elif "return" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'RE'])
                                             elif "if" and "throw" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'IT'])
                                             elif "if" and "revert" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'RH'])
                                             elif "if" in text:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'IF'])
                                             else:
-                                                edge_feature_list.append(
+                                                edge_list.append(
                                                     [callValueList[i][1], var_tmp[len(var_tmp) - 1],
                                                      callValueList[i][1], 3,
                                                      'FW'])
@@ -575,92 +530,92 @@ def generate_graph(filepath):
 
                     if len(var_tmp) > 0:
                         if "assert" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'AH'])
                         elif "require" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'RG'])
                         elif "return" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'RE'])
                         elif j > 1:
                             if "if" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'GN'])
                             elif "for" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'FOR'])
                             elif "else" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'GB'])
                             elif j + 1 < len(callValueList[i][0]):
                                 if "if" and "throw" in callValueList[i][0][j] or "if" in callValueList[i][0][j] \
                                         and "throw" in callValueList[i][0][j + 1]:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'IT'])
                                 elif "if" and "revert" in callValueList[i][0][j] or "if" in callValueList[i][0][j] \
                                         and "revert" in callValueList[i][0][j + 1]:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'RH'])
                                 elif "if" in text:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'IF'])
                                 else:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'FW'])
                             else:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'FW'])
                         else:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [var_tmp[len(var_tmp) - 1], callValueList[i][1], callValueList[i][2], 2, 'FW'])
 
                     elif len(var_tmp) == 0:
                         if "assert" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'AH'])
                         elif "require" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'RG'])
                         elif "return" in text:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'RE'])
                         elif j > 1:
                             if "if" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'GN'])
                             elif "for" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FOR'])
                             elif "else" in callValueList[i][0][j - 1]:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'GB'])
                             elif j + 1 < len(callValueList[i][0]):
                                 if "if" and "throw" in callValueList[i][0][j] or "if" in callValueList[i][0][j] \
                                         and "throw" in callValueList[i][0][j + 1]:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'IT'])
                                 elif "if" and "revert" in callValueList[i][0][j] or "if" in callValueList[i][0][j] \
                                         and "revert" in callValueList[i][0][j + 1]:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'RH'])
                                 elif "if" in text:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'IF'])
                                 else:
-                                    edge_feature_list.append(
+                                    edge_list.append(
                                         [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
                             else:
-                                edge_feature_list.append(
+                                edge_list.append(
                                     [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
                         else:
-                            edge_feature_list.append(
+                            edge_list.append(
                                 [callValueList[i][2], callValueList[i][1], callValueList[i][2], 1, 'FW'])
 
         # (2) handle C->W (include C->VAR, VAR->W)
-        for i in range(len(NormalFunctions)):
-            for j in range(len(NormalFunctions[i][3])):
-                text = NormalFunctions[i][3][j]
+        for i in range(len(CFunctionLists)):
+            for j in range(len(CFunctionLists[i][3])):
+                text = CFunctionLists[i][3][j]
                 var_flag = 0
                 for k in range(len(var_list)):
                     if var_list[k] in text:
@@ -672,7 +627,7 @@ def generate_graph(filepath):
                             if var_op_bool[b] in text:
                                 node_feature_list.append(
                                     ["VAR" + str(len(var_tmp)), "VAR" + str(len(var_tmp)),
-                                     NormalFunctions[i][2], 1, 'BOOL'])
+                                     CFunctionLists[i][2], 1, 'BOOL'])
                                 var_node += 1
                                 var_bool_node += 1
                                 break
@@ -682,94 +637,80 @@ def generate_graph(filepath):
                                 if var_op_assign[a] in text:
                                     node_feature_list.append(
                                         ["VAR" + str(len(var_tmp)), "VAR" + str(len(var_tmp)),
-                                         NormalFunctions[i][2], 1, 'ASSIGN'])
+                                         CFunctionLists[i][2], 1, 'ASSIGN'])
                                     var_node += 1
                                     break
 
                         if var_node == 0:
                             node_feature_list.append(
                                 ["VAR" + str(len(var_tmp)), "VAR" + str(len(var_tmp)),
-                                 NormalFunctions[i][2], 1, 'NULL'])
+                                 CFunctionLists[i][2], 1, 'NULL'])
 
                         if "assert" in text:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'AH'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'AH'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         elif "require" in text:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'RG'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'RG'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         elif "if" and "throw" in text:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'IT'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'IT'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         elif "if" and "revert" in text:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'RH'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'RH'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         elif "if" in text:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'IF'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'IF'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         else:
-                            edge_feature_list.append(
-                                [NormalFunctions[i][2], "VAR" + str(len(var_tmp)), NormalFunctions[i][2], 1, 'FW'])
-                            edge_feature_list.append(
-                                ["VAR" + str(len(var_tmp)), NormalFunctions[i][0], NormalFunctions[i][2], 2, 'FW'])
+                            edge_list.append(
+                                [CFunctionLists[i][2], "VAR" + str(len(var_tmp)), CFunctionLists[i][2], 1, 'FW'])
+                            edge_list.append(
+                                ["VAR" + str(len(var_tmp)), CFunctionLists[i][0], CFunctionLists[i][2], 2, 'FW'])
                         break
 
                 if var_flag == 0:
                     if "assert" in text:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'AH'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'AH'])
                     elif "require" in text:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'RG'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'RG'])
                     elif "if" and "throw" in text:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'IT'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'IT'])
                     elif "if" and "revert" in text:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'RH'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'RH'])
                     elif "if" in text:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'IF'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'IF'])
                     else:
-                        edge_feature_list.append(
-                            [NormalFunctions[i][2], NormalFunctions[i][0], NormalFunctions[i][2], 1, 'FW'])
+                        edge_list.append(
+                            [CFunctionLists[i][2], CFunctionLists[i][0], CFunctionLists[i][2], 1, 'FW'])
                     break
                 else:
                     print("The C function does not call the corresponding W function")
 
     # Handling some duplicate elements, the filter leaves a unique
-    edge_feature_list = list(set([tuple(t) for t in edge_feature_list]))
-    edge_feature_list = [list(v) for v in edge_feature_list]
+    edge_list = list(set([tuple(t) for t in edge_list]))
+    edge_list = [list(v) for v in edge_list]
     node_feature_list_new = []
     [node_feature_list_new.append(i) for i in node_feature_list if not i in node_feature_list_new]
     # node_feature_list = list(set([tuple(t) for t in node_feature_list]))
     # node_feature_list = [list(v) for v in node_feature_list]
     # node_list = list(set(node_list))
 
-    node_feature = sorted(node_feature_list_new, key=lambda x: (x[0]))
-    edge_feature = sorted(edge_feature_list, key=lambda x: (x[2], x[3]))
-
-    # Construct Fallback Node
-    node_feature, edge_feature = generate_potential_fallback_node(node_feature, edge_feature)
-
-    return node_feature, edge_feature
-
-
-# generate a potential fallback node
-def generate_potential_fallback_node(node_feature, edge_feature):
-    node_feature.append(["F", "F", "NoLimit", ["S"], 0, "MSG"])
-    edge_feature.append(["S", "F", "S", 0, "FW"])
-    edge_feature.append(["F", "W0", "F", 1, "FW"])
-    return node_feature, edge_feature
+    return node_feature_list_new, edge_list
 
 
 def printResult(file, node_feature, edge_feature):
@@ -785,8 +726,8 @@ def printResult(file, node_feature, edge_feature):
 
             node_feature[i][3] = tmp
 
-    nodeOutPath = "../../data/reentrancy/node/" + file
-    edgeOutPath = "../../data/reentrancy/edge/" + file
+    nodeOutPath = "../../data/reentrancy/graph_data/node/" + file
+    edgeOutPath = "../../data/reentrancy/graph_data/edge/" + file
 
     f_node = open(nodeOutPath, 'a')
     for i in range(len(node_feature)):
@@ -805,7 +746,23 @@ def printResult(file, node_feature, edge_feature):
 
 
 if __name__ == "__main__":
-    test_contract = "../../data/reentrancy/simple_dao.sol"
+    test_contract = "../data/reentrancy/source_code/cross-function-reentrancy.sol"
     node_feature, edge_feature = generate_graph(test_contract)
+    node_feature = sorted(node_feature, key=lambda x: (x[0]))
+    edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))
+    node_feature, edge_feature = generate_potential_fallback_node(node_feature, edge_feature)
     print("node_feature", node_feature)
     print("edge_feature", edge_feature)
+
+    # inputFileDir = "../data/reentrancy/source_code/"
+    # dirs = os.listdir(inputFileDir)
+    # start_time = time.time()
+    # for file in dirs:
+    #     inputFilePath = inputFileDir + file
+    #     node_feature, edge_feature = generate_graph(inputFilePath)
+    #     node_feature = sorted(node_feature, key=lambda x: (x[0]))
+    #     edge_feature = sorted(edge_feature, key=lambda x: (x[2], x[3]))
+    #     printResult(file, node_feature, edge_feature)
+    #
+    # end_time = time.time()
+    # print(end_time - start_time)

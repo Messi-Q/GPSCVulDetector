@@ -1,5 +1,7 @@
+import os
+import json
 import numpy as np
-from examples.vec2onehot import vec2onehot
+from vec2onehot import vec2onehot
 
 """
 S, W, C features: Node features + Edge features + Var features;
@@ -397,8 +399,8 @@ def construct_vec(edge_list, node_embedding, var_embedding, edge_embedding, edge
 
 
 if __name__ == "__main__":
-    node = "../../data/reentrancy/graph_data/nodes_185_cleaned/cross-function-reentrancy-fixed.sol"
-    edge = "../../data/reentrancy/graph_data/edges_185_cleaned/cross-function-reentrancy-fixed.sol"
+    node = "../data/reentrancy/graph_data/node/cross-function-reentrancy-fixed.sol"
+    edge = "../data/reentrancy/graph_data/edge/cross-function-reentrancy-fixed.sol"
     nodeNum, node_list, node_attribute_list = extract_node_features(node)
     node_attribute_list, extra_var_list = elimination_node(node_attribute_list)
     node_encode, var_encode, node_embedding, var_embedding = embedding_node(node_attribute_list)
