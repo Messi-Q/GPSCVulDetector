@@ -13,8 +13,6 @@ class FNN:
     def __init__(self, in_dim, n_hidden, out_dim):
         super(FNN, self).__init__()
 
-
-
     def train(self, x):
         x = self.layer1(x)
         x = self.layer2(x)

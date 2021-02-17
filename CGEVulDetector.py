@@ -1,7 +1,7 @@
 import numpy as np
 from parser import parameter_parser
-from models.EncoderConv1D import EncoderConv1D
-from models.EncoderLSTM import EncoderLSTM
+from models.CGE_Conv_Maxpooling import CGEConv
+from models.CGE_Variants import CGEVariant
 from preprocessing import get_graph_feature, get_pattern_feature
 
 args = parameter_parser()
@@ -9,7 +9,7 @@ args = parameter_parser()
 
 def main():
     graph_train, graph_test, graph_experts_train, graph_experts_test = get_graph_feature()
-    pattern_train, pattern_test, label_by_extractor_train, label_by_extractor_valid = get_pattern_feature()
+    pattern_train, pattern_test, _, _ = get_pattern_feature()
 
     graph_train = np.array(graph_train)  # The training set of graph feature
     graph_test = np.array(graph_test)  # The testing set of graph feature
@@ -51,10 +51,10 @@ def main():
         y_test.append(int(graph_experts_test[i]))
     y_test = np.array(y_test)
 
-    if args.model == 'EncoderConv1D':  # Conv layer and dense layer
-        model = EncoderConv1D(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
-    elif args.model == 'EncoderLSTM':  # Conv layer and dense layer
-        model = EncoderLSTM(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
+    if args.model == 'CGEConv':  # Conv layer and dense layer
+        model = CGEConv(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
+    elif args.model == 'CGEVariant':  # Conv layer and dense layer
+        model = CGEVariant(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
 
     model.train()  # training
     model.test()  # testing

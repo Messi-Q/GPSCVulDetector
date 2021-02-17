@@ -5,6 +5,7 @@ from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix
 from models.loss_draw import LossHistory
 
+tf.compat.v1.set_random_seed(9906)
 args = parameter_parser()
 
 """
@@ -13,7 +14,7 @@ This method is presented in our journal paper.
 """
 
 
-class EncoderConv1D:
+class CGEConv:
     def __init__(self, graph_train, graph_test, pattern_train, pattern_test, y_train, y_test,
                  batch_size=args.batch_size, lr=args.lr, epochs=args.epochs):
         input1 = tf.keras.Input(shape=(1, 250), name='input1')
@@ -29,17 +30,17 @@ class EncoderConv1D:
         self.epochs = epochs
         self.class_weight = compute_class_weight(class_weight='balanced', classes=[0, 1], y=y_train)
 
-        graph_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(
-            input1)
-        graph_train = tf.keras.layers.MaxPool1D(pool_size=1, strides=1)(graph_train)
+        graph_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(input1)
+        graph_train = tf.keras.layers.MaxPooling1D(pool_size=1, strides=1)(graph_train)
 
-        pattern_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(
-            input2)
-        pattern_train = tf.keras.layers.MaxPool1D(pool_size=3, strides=3)(pattern_train)
+        pattern_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(input2)
+        pattern_train = tf.keras.layers.MaxPooling1D(pool_size=3, strides=3)(pattern_train)
 
         mergevec = tf.keras.layers.Concatenate()([graph_train, pattern_train])
-        mergevec = tf.keras.layers.Dense(50, activation='relu')(mergevec)
-        prediction = tf.keras.layers.Dense(1, activation='sigmoid', name='output')(mergevec)
+        Dense1 = tf.keras.layers.Dense(100, activation='relu')(mergevec)
+        Dense2 = tf.keras.layers.Dense(50, activation='relu')(Dense1)
+        Dense3 = tf.keras.layers.Dense(10, activation='relu')(Dense2)
+        prediction = tf.keras.layers.Dense(1, activation='sigmoid', name='output')(Dense3)
 
         model = tf.keras.Model(inputs=[input1, input2], outputs=[prediction])
 
