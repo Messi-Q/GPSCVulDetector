@@ -1,8 +1,6 @@
 import os
-import re
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
 
 """
 Here is the method for extracting security patterns of timestamp dependence.
@@ -51,7 +49,7 @@ def extract_pattern(filepath):
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
 
-    ################   pattern 1  #######################
+    ################   pattern 1: timestampInvocation  #######################
     if len(timeStampList) != 0:
         pattern_list.append(1)
     else:
@@ -59,7 +57,7 @@ def extract_pattern(filepath):
         pattern_list.append(0)
         pattern_list.append(0)
 
-    ################   pattern 2  #######################
+    ################   pattern 2: timestampAssign      #######################
     for i in range(len(timeStampList)):
         TimestampFlag1 = 0
         VarTimestamp = None
@@ -83,7 +81,7 @@ def extract_pattern(filepath):
                     pattern_list.append(0)
                     break
 
-    ################   pattern 3  #######################
+    ################  pattern 3: timestampContamination  #######################
     for i in range(len(timeStampList)):
         TimestampFlag2 = 0
         VarTimestamp = None
@@ -109,18 +107,18 @@ def extract_pattern(filepath):
     return pattern_list
 
 
-def extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3):
+def extract_feature_by_fnn(outputPathFC, pattern1, pattern2, pattern3):
     pattern1 = torch.Tensor(pattern1)
     pattern2 = torch.Tensor(pattern2)
     pattern3 = torch.Tensor(pattern3)
-    model = SimpleFC(4, 100, 200)
+    model = FFNNP(4, 100, 250)
 
     pattern1FC = model(pattern1).detach().numpy().tolist()
     pattern2FC = model(pattern2).detach().numpy().tolist()
     pattern3FC = model(pattern3).detach().numpy().tolist()
-    patter_final = np.array([pattern1FC, pattern2FC, pattern3FC])
+    pattern_final = np.array([pattern1FC, pattern2FC, pattern3FC])
 
-    np.savetxt(outputPathFC, patter_final, fmt="%.6f")
+    np.savetxt(outputPathFC, pattern_final, fmt="%.6f")
 
 
 if __name__ == "__main__":
@@ -128,7 +126,7 @@ if __name__ == "__main__":
     # pattern2 = [0, 1, 0]
     # pattern3 = [0, 0, 1]
     # label1 = None
-    # test_contract = "../data/timestamp/15.sol"
+    # test_contract = "../data/timestamp/source_code/15.sol"
     # pattern_list = extract_pattern(test_contract)
     # if len(pattern_list) == 3:
     #     if pattern_list[0] == 1:
@@ -146,10 +144,9 @@ if __name__ == "__main__":
     # pattern3.append(pattern_list[2])
 
     label = None
-    inputFileDir = "../data/timestamp/"
-    outputfeatureDir = "../pattern_feature/feature_zeropadding/timestamp/"
-    outputfeatureFCDir = "../pattern_feature/feature_FNN/timestamp/"
-    outputlabelDir = "../pattern_feature/label_by_extractor/timestamp/"
+    inputFileDir = "../data/timestamp/source_code/"
+    outputfeatureDir = "../pattern_feature/featurezeropadding/timestamp/"
+    outputlabelDir = "../pattern_feature/label_by_autoextractor/timestamp/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
         pattern1 = [1, 0, 0]
@@ -175,20 +172,16 @@ if __name__ == "__main__":
         pattern2.append(pattern_list[1])
         pattern3.append(pattern_list[2])
 
-        outputPathFC = outputfeatureFCDir + name + ".txt"
-        extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3)
-
         pattern1 = np.array(pattern1)
-        pattern1 = np.array(np.pad(pattern1, (0, 196), 'constant'))
+        pattern1 = np.array(np.pad(pattern1, (0, 246), 'constant'))
         pattern2 = np.array(pattern2)
-        pattern2 = np.array(np.pad(pattern2, (0, 196), 'constant'))
+        pattern2 = np.array(np.pad(pattern2, (0, 246), 'constant'))
         pattern3 = np.array(pattern3)
-        pattern3 = np.array(np.pad(pattern3, (0, 196), 'constant'))
-        print(len(pattern3))
+        pattern3 = np.array(np.pad(pattern3, (0, 246), 'constant'))
 
-        patter_final = np.array([pattern1, pattern2, pattern3])
+        pattern_final = np.array([pattern1, pattern2, pattern3])
         outputPath = outputfeatureDir + name + ".txt"
-        np.savetxt(outputPath, patter_final, fmt="%.6f")
+        np.savetxt(outputPath, pattern_final, fmt="%.6f")
 
         outputlabelPath = outputlabelDir + file
         f_outlabel = open(outputlabelPath, 'a')

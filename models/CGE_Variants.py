@@ -3,14 +3,12 @@ from parser import parameter_parser
 import tensorflow as tf
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import confusion_matrix
-from models.loss_draw import LossHistory
 
-tf.compat.v1.set_random_seed(6603)
+tf.compat.v1.set_random_seed(9906)
 args = parameter_parser()
 
 """
-The merged features (graph feature and pattern feature) are fed into the convolution and pooling layers
-This method is presented in our journal paper.
+The merged features (graph feature and pattern feature) are fed into the variants of CGE model
 """
 
 
@@ -30,16 +28,22 @@ class CGEVariant:
         self.epochs = epochs
         self.class_weight = compute_class_weight(class_weight='balanced', classes=[0, 1], y=y_train)
 
-        graph_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(input1)
-        graph_train = tf.keras.layers.MaxPooling1D(pool_size=1, strides=1)(graph_train)
+        # graph feature
+        graph_train = tf.keras.layers.Conv1D(200, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(
+            input1)  # (Conv1D, LSTM, Dense)
+        graph_train = tf.keras.layers.MaxPooling1D(pool_size=1, strides=1)(
+            graph_train)  # (MaxPooling1D, AveragePooling1D)
 
-        pattern_train = tf.keras.layers.Conv1D(100, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(input2)
-        pattern_train = tf.keras.layers.MaxPooling1D(pool_size=3, strides=3)(pattern_train)
+        # pattern feature
+        pattern_train = tf.keras.layers.Conv1D(200, kernel_size=3, strides=1, activation=tf.nn.relu, padding='same')(
+            input2)  # (Conv1D, LSTM, Dense)
+        pattern_train = tf.keras.layers.MaxPooling1D(pool_size=3, strides=3)(
+            pattern_train)  # (MaxPooling1D, AveragePooling1D)
 
         mergevec = tf.keras.layers.Concatenate()([graph_train, pattern_train])
         # Dense1 = tf.keras.layers.Dense(100, activation='relu')(mergevec)
         # Dense2 = tf.keras.layers.Dense(50, activation='relu')(Dense1)
-        Dense3 = tf.keras.layers.Dense(10, activation='relu')(mergevec)
+        Dense3 = tf.keras.layers.Dense(10, activation='relu')(mergevec)  # number of dense layers
         prediction = tf.keras.layers.Dense(1, activation='sigmoid', name='output')(Dense3)
 
         model = tf.keras.Model(inputs=[input1, input2], outputs=[prediction])
@@ -54,12 +58,10 @@ class CGEVariant:
     """
 
     def train(self):
-        # create the history instance
-        # history = LossHistory()
-        self.model.fit([self.graph_train, self.pattern_train], self.y_train, batch_size=self.batch_size, epochs=self.epochs,
+        self.model.fit([self.graph_train, self.pattern_train], self.y_train, batch_size=self.batch_size,
+                       epochs=self.epochs,
                        class_weight=self.class_weight)
         # self.model.save_weights("model.pkl")
-        # history.loss_plot('epoch')
 
     """
     Testing model
@@ -76,7 +78,7 @@ class CGEVariant:
         tn, fp, fn, tp = confusion_matrix(self.y_test, predictions).ravel()
         print("Accuracy: ", (tp + tn) / (tp + tn + fp + fn))
         print('False positive rate(FPR): ', fp / (fp + tn))
-        print('False negative rate(FN): ', fn / (fn + tp))
+        print('False negative rate(FNR): ', fn / (fn + tp))
         recall = tp / (tp + fn)
         print('Recall(TPR): ', recall)
         precision = tp / (tp + fp)

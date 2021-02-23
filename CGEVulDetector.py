@@ -1,6 +1,6 @@
 import numpy as np
 from parser import parameter_parser
-from models.CGE_Conv_Maxpooling import CGEConv
+from models.CGE import CGEConv
 from models.CGE_Variants import CGEVariant
 from preprocessing import get_graph_feature, get_pattern_feature
 
@@ -18,23 +18,19 @@ def main():
     pattern1train = []
     pattern2train = []
     pattern3train = []
-    pattern4train = []
     for i in range(len(pattern_train)):
         pattern1train.append([pattern_train[i][0]])
         pattern2train.append([pattern_train[i][1]])
         pattern3train.append([pattern_train[i][2]])
-        # pattern4train.append([pattern_train[i][3]])
 
     # The testing set of patterns' feature
     pattern1test = []
     pattern2test = []
     pattern3test = []
-    pattern4test = []
     for i in range(len(pattern_test)):
         pattern1test.append([pattern_test[i][0]])
         pattern2test.append([pattern_test[i][1]])
         pattern3test.append([pattern_test[i][2]])
-        # pattern4test.append([pattern_test[i][3]])
 
     pattern_train = np.array(pattern_train)
     pattern_test = np.array(pattern_test)
@@ -51,7 +47,7 @@ def main():
         y_test.append(int(graph_experts_test[i]))
     y_test = np.array(y_test)
 
-    if args.model == 'CGEConv':  # Conv layer and dense layer
+    if args.model == 'CGEConv':  # Conv layer, maxpooling layer, dense layer
         model = CGEConv(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
     elif args.model == 'CGEVariant':  # Conv layer and dense layer
         model = CGEVariant(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)

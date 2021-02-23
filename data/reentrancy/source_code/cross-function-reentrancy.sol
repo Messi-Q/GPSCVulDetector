@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
-
-contract crossFunctionReentrancy{
+contract Owner{
+    mapping (address => uint) private userBalances;
     mapping (address => bool) private claimedBonus;
     mapping (address => uint) private rewardsForA;
 
@@ -11,11 +11,12 @@ contract crossFunctionReentrancy{
     }
 
     function GetFirstWithdrawalBonus(address recipient) public {
+
         if (claimedBonus[recipient] == false) {
             throw;
         }
         rewardsForA[recipient] += 100;
         WithdrawReward(recipient);
-        claimedBonus[recipient] = false;
+        claimedBonus[recipient] = true;
     }
 }

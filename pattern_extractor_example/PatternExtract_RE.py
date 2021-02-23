@@ -2,7 +2,6 @@ import re
 import os
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
 
 patterns = {"pattern1": 1, "pattern2": 2, "pattern3": 3}
 
@@ -51,7 +50,7 @@ def extract_pattern(filepath):
         if flag == 0:
             otherFunctionList.append(allFunctionList[i])
 
-    ################   pattern 1  #######################
+    ################  pattern 1: callValueInvocation  #######################
     if len(callValueList) != 0:
         pattern_list.append(1)
     else:
@@ -59,10 +58,9 @@ def extract_pattern(filepath):
         pattern_list.append(0)
         pattern_list.append(0)
 
-    ################   pattern 2  #######################
+    ################   pattern 2: balanceDeduction   #######################
     for i in range(len(callValueList)):
         CallValueFlag1 = 0
-
         if len(pattern_list) > 1:
             break
 
@@ -78,11 +76,10 @@ def extract_pattern(filepath):
                 elif j + 1 == len(callValueList[i]) and len(pattern_list) == 1:
                     pattern_list.append(0)
 
-    ################   pattern 3  #######################
+    ################   pattern 3: enoughBalance     #######################
     for i in range(len(callValueList)):
         CallValueFlag2 = 0
         param = None
-
         if len(pattern_list) > 2:
             break
 
@@ -101,47 +98,49 @@ def extract_pattern(filepath):
     return pattern_list
 
 
-def extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3):
+def extract_feature_by_fnn(outputPathFNN, pattern1, pattern2, pattern3):
     pattern1 = torch.Tensor(pattern1)
     pattern2 = torch.Tensor(pattern2)
     pattern3 = torch.Tensor(pattern3)
-    model = SimpleFC(4, 100, 250)
+    model = FFNNP(4, 100, 250)
 
     pattern1FC = model(pattern1).detach().numpy().tolist()
     pattern2FC = model(pattern2).detach().numpy().tolist()
     pattern3FC = model(pattern3).detach().numpy().tolist()
-    patter_final = np.array([pattern1FC, pattern2FC, pattern3FC])
+    pattern_final = np.array([pattern1FC, pattern2FC, pattern3FC])
 
-    np.savetxt(outputPathFC, patter_final, fmt="%.6f")
+    np.savetxt(outputPathFNN, pattern_final, fmt="%.6f")
 
 
 if __name__ == "__main__":
     # pattern1 = [1, 0, 0]
     # pattern2 = [0, 1, 0]
     # pattern3 = [0, 0, 1]
-    # label1 = None
-    # test_contract = "../data/reentrancy/40366.sol"
+    # contract_label = None
+    # test_contract = "../data/reentrancy/source_code/40366.sol"
     # pattern_list = extract_pattern(test_contract)
     # if len(pattern_list) == 3:
     #     if pattern_list[0] == 1:
     #         if pattern_list[1] == 1 and pattern_list[2] == 1:
-    #             label1 = 1
+    #             contract_label = 1
     #         else:
-    #             label1 = 0
+    #             contract_label = 0
     #     else:
-    #         label1 = 0
+    #         contract_label = 0
     # else:
     #     print("The extracted patterns are error!")
     #
     # pattern1.append(pattern_list[0])
     # pattern2.append(pattern_list[1])
     # pattern3.append(pattern_list[2])
+    # print(pattern1)
+    # print(pattern2)
+    # print(pattern3)
 
     label = None
-    inputFileDir = "../data/reentrancy/"
-    outputfeatureDir = "../pattern_feature/feature_zeropadding/reentrancy/"
-    outputfeatureFCDir = "../pattern_feature/feature_FNN/reentrancy/"
-    outputlabelDir = "../pattern_feature/label_by_extractor/reentrancy/"
+    inputFileDir = "../data/reentrancy/source_code/"
+    outputfeatureDir = "../pattern_feature/featurezeropadding/reentrancy/"
+    outputlabelDir = "../pattern_feature/label_by_autoextractor/reentrancy/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
         pattern1 = [1, 0, 0]
@@ -167,9 +166,6 @@ if __name__ == "__main__":
         pattern2.append(pattern_list[1])
         pattern3.append(pattern_list[2])
 
-        outputPathFC = outputfeatureFCDir + name + ".txt"
-        # extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3)
-
         pattern1 = np.array(pattern1)
         pattern1 = np.array(np.pad(pattern1, (0, 246), 'constant'))
         pattern2 = np.array(pattern2)
@@ -177,9 +173,9 @@ if __name__ == "__main__":
         pattern3 = np.array(pattern3)
         pattern3 = np.array(np.pad(pattern3, (0, 246), 'constant'))
 
-        patter_final = np.array([pattern1, pattern2, pattern3])
+        pattern_final = np.array([pattern1, pattern2, pattern3])
         outputPath = outputfeatureDir + name + ".txt"
-        np.savetxt(outputPath, patter_final, fmt="%.6f")
+        np.savetxt(outputPath, pattern_final, fmt="%.6f")
 
         outputlabelPath = outputlabelDir + file
         f_outlabel = open(outputlabelPath, 'a')

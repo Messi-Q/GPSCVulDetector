@@ -2,7 +2,6 @@ import os
 import re
 import torch
 import numpy as np
-from Simple_FC import SimpleFC
 
 """
 Here is the method for extracting security patterns of infinite loop.
@@ -138,7 +137,7 @@ def extract_pattern(filepath):
         else:
             functionNameList.append("Fallback")
 
-    # label_by_extractor node_list
+    # label_by_autoextractor node_list
     for i in range(len(functionNameList)):
         if functionNameList[i] == "Fallback":
             fallbackList.append(allFunctionList[i])
@@ -276,20 +275,20 @@ def extract_pattern(filepath):
     return pattern_list
 
 
-def extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3, pattern4):
+def extract_feature_by_fnn(outputPathFC, pattern1, pattern2, pattern3, pattern4):
     pattern1 = torch.Tensor(pattern1)
     pattern2 = torch.Tensor(pattern2)
     pattern3 = torch.Tensor(pattern3)
     pattern4 = torch.Tensor(pattern4)
-    model = SimpleFC(5, 100, 200)
+    model = FFNNP(5, 100, 200)
 
     pattern1FC = model(pattern1).detach().numpy().tolist()
     pattern2FC = model(pattern2).detach().numpy().tolist()
     pattern3FC = model(pattern3).detach().numpy().tolist()
     pattern4FC = model(pattern4).detach().numpy().tolist()
-    patter_final = np.array([pattern1FC, pattern2FC, pattern3FC, pattern4FC])
+    pattern_final = np.array([pattern1FC, pattern2FC, pattern3FC, pattern4FC])
 
-    np.savetxt(outputPathFC, patter_final, fmt="%.6f")
+    np.savetxt(outputPathFC, pattern_final, fmt="%.6f")
 
 
 if __name__ == "__main__":
@@ -299,7 +298,7 @@ if __name__ == "__main__":
     # pattern4 = [0, 0, 0, 1]
     #
     # label1 = None
-    # test_contract = "../data/loops/loopwhile77.c"
+    # test_contract = "../data/featurezeropadding/source_code/loopwhile77.c"
     # pattern_list = extract_pattern(test_contract)
     # if len(pattern_list) == 4:
     #     if sum(pattern_list) == 0:
@@ -315,10 +314,9 @@ if __name__ == "__main__":
     # pattern4.append(pattern_list[3])
 
     label = None
-    inputFileDir = "../data/loops/"
-    outputfeatureDir = "../pattern_feature/feature_zeropadding/loops/"
-    outputfeatureFCDir = "../pattern_feature/feature_FNN/loops/"
-    outputlabelDir = "../pattern_feature/label_by_extractor/loops/"
+    inputFileDir = "../data/loops/source_code/"
+    outputfeatureDir = "../pattern_feature/featurezeropadding/loops/"
+    outputlabelDir = "../pattern_feature/label_by_autoextractor/loops/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
         pattern1 = [1, 0, 0, 0]
@@ -343,22 +341,18 @@ if __name__ == "__main__":
         pattern3.append(pattern_list[2])
         pattern4.append(pattern_list[3])
 
-        outputPathFC = outputfeatureFCDir + name + ".txt"
-        extract_feature_with_fc(outputPathFC, pattern1, pattern2, pattern3, pattern4)
-
         pattern1 = np.array(pattern1)
-        pattern1 = np.array(np.pad(pattern1, (0, 195), 'constant'))
+        pattern1 = np.array(np.pad(pattern1, (0, 245), 'constant'))
         pattern2 = np.array(pattern2)
-        pattern2 = np.array(np.pad(pattern2, (0, 195), 'constant'))
+        pattern2 = np.array(np.pad(pattern2, (0, 245), 'constant'))
         pattern3 = np.array(pattern3)
-        pattern3 = np.array(np.pad(pattern3, (0, 195), 'constant'))
+        pattern3 = np.array(np.pad(pattern3, (0, 245), 'constant'))
         pattern4 = np.array(pattern4)
-        pattern4 = np.array(np.pad(pattern4, (0, 195), 'constant'))
-        print(len(pattern4))
+        pattern4 = np.array(np.pad(pattern4, (0, 245), 'constant'))
 
-        patter_final = np.array([pattern1, pattern2, pattern3, pattern4])
+        pattern_final = np.array([pattern1, pattern2, pattern3, pattern4])
         outputPath = outputfeatureDir + name + ".txt"
-        np.savetxt(outputPath, patter_final, fmt="%.6f")
+        np.savetxt(outputPath, pattern_final, fmt="%.6f")
 
         outputlabelPath = outputlabelDir + file
         f_outlabel = open(outputlabelPath, 'a')
