@@ -29,7 +29,7 @@ def main():
         y_test.append(int(graph_experts_test[i]))
     y_test = np.array(y_test)
 
-    if args.model == 'CGEConv':  # Conv layer, maxpooling layer, dense layer
+    if args.model == 'CGE':  # Conv layer, maxpooling layer, dense layer
         model = CGEConv(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)
     elif args.model == 'CGEVariant':  # Conv layer and dense layer
         model = CGEVariant(graph_train, graph_test, pattern_train, pattern_test, y_train, y_test)

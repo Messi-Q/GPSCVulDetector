@@ -1,19 +1,20 @@
 # GPSCVulDetector
 
-This repo is a python implementation of smart contract vulnerability detection of our method (CGE). 
-Here, we explore combining graph neural networks with expert knowledge for smart contract vulnerability detection.
+This repo is a python implementation of combining graph neural network with expert patterns for smart contract vulnerability detection (CGE). 
 
 ## Requirements
 
 ### Required Packages
 * **python**3 or above
 * **TensorFlow** 2.0
+* **numpy** 1.18.2
 * **sklearn** for model evaluation
 
 Run the following script to install the required packages.
 ```shell
 pip install --upgrade pip
 pip install tensorflow==2.0
+pip install numpy==1.18.2
 pip install scikit-learn
 ```
 
@@ -32,14 +33,15 @@ ${GPSCVulDetector}
 │   ├── timestamp
 │   └── reentrancy
 └── pattern_feature
-    ├── feature_by_fc
     ├── feature_by_zeropadding
-    └── label_by_extractor
+    ├── original_pattern_feature
+    └── label_by_autoextractor
 ```
 
-**Note:** 
-The graph feature of related smart contract is extracted by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) published on the IJCAI 2020.
-The pattern feature of related smart contract is extracted by the tools in the category `pattern_extractor`.  
+## Graph extractor & Pattern extractor
+1. **Graph:** The contract graph and its feature of certain smart contract are extracted by the auto extractor 
+implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in the directory `graph_extractor_example`.
+2. **Pattern:** The expert pattern and its feature of certain smart contract are extracted by the auto extractor in the directory `pattern_extractor_example`.  
 
 
 ## Running Project
@@ -49,7 +51,7 @@ The pattern feature of related smart contract is extracted by the tools in the c
 Examples:
 ```shell
 python GPSCVulDetector.py
-python GPSCVulDetector.py --model EncoderConv1D --lr 0.002 --dropout 0.2 --epochs 50 --batch_size 32
+python GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 50 --batch_size 32
 ```
 
 ## References
@@ -65,4 +67,14 @@ python GPSCVulDetector.py --model EncoderConv1D --lr 0.002 --dropout 0.2 --epoch
   year      = {2020},
 }
 
+```
+2. Towards Automated Reentrancy Detection for Smart Contracts Based on Sequential Models. IEEE Access. [ReChecker](https://github.com/Messi-Q/ReChecker).
+```
+@article{qian2020towards,
+  title={Towards Automated Reentrancy Detection for Smart Contracts Based on Sequential Models},
+  author={Qian, Peng and Liu, Zhenguang and He, Qinming and Zimmermann, Roger and Wang, Xun},
+  journal={IEEE Access},
+  year={2020},
+  publisher={IEEE}
+}
 ```
