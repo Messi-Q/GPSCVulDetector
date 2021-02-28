@@ -14,24 +14,6 @@ def main():
     graph_train = np.array(graph_train)  # The training set of graph feature
     graph_test = np.array(graph_test)  # The testing set of graph feature
 
-    # The training set of patterns' feature
-    pattern1train = []
-    pattern2train = []
-    pattern3train = []
-    for i in range(len(pattern_train)):
-        pattern1train.append([pattern_train[i][0]])
-        pattern2train.append([pattern_train[i][1]])
-        pattern3train.append([pattern_train[i][2]])
-
-    # The testing set of patterns' feature
-    pattern1test = []
-    pattern2test = []
-    pattern3test = []
-    for i in range(len(pattern_test)):
-        pattern1test.append([pattern_test[i][0]])
-        pattern2test.append([pattern_test[i][1]])
-        pattern3test.append([pattern_test[i][2]])
-
     pattern_train = np.array(pattern_train)
     pattern_test = np.array(pattern_test)
 

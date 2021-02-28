@@ -298,7 +298,7 @@ if __name__ == "__main__":
     # pattern4 = [0, 0, 0, 1]
     #
     # label1 = None
-    # test_contract = "../data/featurezeropadding/source_code/loopwhile77.c"
+    # test_contract = "../data/feature_by_zeropadding/source_code/loopwhile77.c"
     # pattern_list = extract_pattern(test_contract)
     # if len(pattern_list) == 4:
     #     if sum(pattern_list) == 0:
@@ -315,7 +315,8 @@ if __name__ == "__main__":
 
     label = None
     inputFileDir = "../data/loops/source_code/"
-    outputfeatureDir = "../pattern_feature/featurezeropadding/loops/"
+    outputOriginalPattern = "../pattern_feature/original_pattern_feature/loops/"
+    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/loops/"
     outputlabelDir = "../pattern_feature/label_by_autoextractor/loops/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
@@ -342,18 +343,19 @@ if __name__ == "__main__":
         pattern4.append(pattern_list[3])
 
         pattern1 = np.array(pattern1)
-        pattern1 = np.array(np.pad(pattern1, (0, 245), 'constant'))
+        pattern11 = np.array(np.pad(pattern1, (0, 246), 'constant'))
         pattern2 = np.array(pattern2)
-        pattern2 = np.array(np.pad(pattern2, (0, 245), 'constant'))
+        pattern22 = np.array(np.pad(pattern2, (0, 246), 'constant'))
         pattern3 = np.array(pattern3)
-        pattern3 = np.array(np.pad(pattern3, (0, 245), 'constant'))
-        pattern4 = np.array(pattern4)
-        pattern4 = np.array(np.pad(pattern4, (0, 245), 'constant'))
+        pattern33 = np.array(np.pad(pattern3, (0, 246), 'constant'))
 
-        pattern_final = np.array([pattern1, pattern2, pattern3, pattern4])
+        pattern_final = np.array([pattern11, pattern22, pattern33])
+        original_pattern = np.array([pattern1, pattern2, pattern3])
         outputPath = outputfeatureDir + name + ".txt"
         np.savetxt(outputPath, pattern_final, fmt="%.6f")
+        outputPath1 = outputOriginalPattern + name + ".txt"
+        np.savetxt(outputPath1, original_pattern, fmt="%.6f")
 
-        outputlabelPath = outputlabelDir + file
-        f_outlabel = open(outputlabelPath, 'a')
-        f_outlabel.write(str(label))
+        # outputlabelPath = outputlabelDir + file
+        # f_outlabel = open(outputlabelPath, 'a')
+        # f_outlabel.write(str(label))

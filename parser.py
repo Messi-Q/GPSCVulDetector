@@ -7,7 +7,7 @@ def parameter_parser():
 
     parser.add_argument('-D', '--dataset', type=str, default='', choices=[])
     parser.add_argument('-M', '--model', type=str, default='CGEConv',
-                        choices=['CGEConv', 'CGEVariant', 'FFNN'])
+                        choices=['CGEConv', 'CGEVariant'])
     parser.add_argument('--lr', type=float, default=0.002, help='learning rate')
     parser.add_argument('-d', '--dropout', type=float, default=0.2, help='dropout rate')
     parser.add_argument('--epochs', type=int, default=100, help='number of epochs')

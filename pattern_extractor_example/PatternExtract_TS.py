@@ -145,7 +145,8 @@ if __name__ == "__main__":
 
     label = None
     inputFileDir = "../data/timestamp/source_code/"
-    outputfeatureDir = "../pattern_feature/featurezeropadding/timestamp/"
+    outputOriginalPattern = "../pattern_feature/original_pattern_feature/timestamp/"
+    outputfeatureDir = "../pattern_feature/feature_by_zeropadding/timestamp/"
     outputlabelDir = "../pattern_feature/label_by_autoextractor/timestamp/"
     dirs = os.listdir(inputFileDir)
     for file in dirs:
@@ -173,16 +174,19 @@ if __name__ == "__main__":
         pattern3.append(pattern_list[2])
 
         pattern1 = np.array(pattern1)
-        pattern1 = np.array(np.pad(pattern1, (0, 246), 'constant'))
+        pattern11 = np.array(np.pad(pattern1, (0, 246), 'constant'))
         pattern2 = np.array(pattern2)
-        pattern2 = np.array(np.pad(pattern2, (0, 246), 'constant'))
+        pattern22 = np.array(np.pad(pattern2, (0, 246), 'constant'))
         pattern3 = np.array(pattern3)
-        pattern3 = np.array(np.pad(pattern3, (0, 246), 'constant'))
+        pattern33 = np.array(np.pad(pattern3, (0, 246), 'constant'))
 
-        pattern_final = np.array([pattern1, pattern2, pattern3])
+        pattern_final = np.array([pattern11, pattern22, pattern33])
+        original_pattern = np.array([pattern1, pattern2, pattern3])
         outputPath = outputfeatureDir + name + ".txt"
         np.savetxt(outputPath, pattern_final, fmt="%.6f")
+        outputPath1 = outputOriginalPattern + name + ".txt"
+        np.savetxt(outputPath1, original_pattern, fmt="%.6f")
 
-        outputlabelPath = outputlabelDir + file
-        f_outlabel = open(outputlabelPath, 'a')
-        f_outlabel.write(str(label))
+        # outputlabelPath = outputlabelDir + file
+        # f_outlabel = open(outputlabelPath, 'a')
+        # f_outlabel.write(str(label))

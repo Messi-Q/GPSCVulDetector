@@ -4,13 +4,13 @@ import numpy as np
 def get_pattern_feature():
     train_total_name_path = "./graph_feature/reentrancy/contract_name_train.txt"
     valid_total_name_path = "./graph_feature/reentrancy/contract_name_valid.txt"
-    pattern_feature_path = "./pattern_feature/featurezeropadding/reentrancy/"
+    pattern_feature_path = "./pattern_feature/feature_by_zeropadding/reentrancy/"
 
     final_pattern_feature_train = []  # pattern feature train
-    pattern_feature_train_label_path = "./pattern_feature/featurezeropadding/reentrancy/label_by_extractor_train.txt"
+    pattern_feature_train_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_train.txt"
     
     final_pattern_feature_valid = []  # pattern feature valid
-    pattern_feature_test_label_path = "./pattern_feature/featurezeropadding/reentrancy/label_by_extractor_valid.txt"
+    pattern_feature_test_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_valid.txt"
 
     f_train = open(train_total_name_path, 'r')
     lines = f_train.readlines()

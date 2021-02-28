@@ -3,7 +3,7 @@ import numpy as np
 train_total_name_path = "../graph_feature/reentrancy/contract_name_train.txt"
 valid_total_name_path = "../graph_feature/reentrancy/contract_name_valid.txt"
 label_path = "./label_by_autoextractor/reentrancy/"
-outputFinalLabelByExtractor = "./featurezeropadding/reentrancy/label_by_extractor_train.txt"
+outputFinalLabelByExtractor = "./feature_by_zeropadding/reentrancy/label_by_extractor_train.txt"
 
 f = open(train_total_name_path, 'r')
 lines = f.readlines()
