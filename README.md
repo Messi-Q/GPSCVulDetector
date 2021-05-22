@@ -1,6 +1,6 @@
 # GPSCVulDetector
 
-This repo is a python implementation of combining graph neural network with expert patterns for smart contract vulnerability detection (CGE). 
+This repo is a python implementation of combining graph neural network with expert patterns for smart contract vulnerability detection. 
 
 ## Requirements
 
@@ -39,14 +39,14 @@ ${GPSCVulDetector}
 ```
 
 ## Graph extractor & Pattern extractor
-1. **Graph:** The contract graph and its feature of certain smart contract are extracted by the auto extractor 
-implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in the directory `graph_extractor_example`.
-2. **Pattern:** The expert pattern and its feature of certain smart contract are extracted by the auto extractor in the directory `pattern_extractor_example`.  
+1. **Graph:** The contract graph and its feature are extracted by the automatic graph extractor 
+implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in this directory `graph_extractor_example`.
+2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in this directory `pattern_extractor_example`.  
 
 
 ## Running Project
 * To run program, use this command: python GPSCVulDetector.py.
-* Also, you can use specific hyper-parameters to train the model. All the hyper-parameters can be found in `parser.py`.
+* Also, you can use specific hyperparameters to train the model. All the hyperparameters can be found in `parser.py`.
 
 Examples:
 ```shell
