@@ -1,6 +1,20 @@
 # GPSCVulDetector
 
-This repo is a python implementation of combining graph neural network with expert patterns for smart contract vulnerability detection. 
+This repo is a python implementation of combining graph neural network with expert knowledge for smart contract vulnerability detection. 
+
+## Citation
+Please use this citation if you want to cite our [paper](https://ieeexplore.ieee.org/abstract/document/9477066/) or codebase in your paper:
+```
+@ARTICLE{9477066,  
+author={Liu, Zhenguang and Qian, Peng and Wang, Xiaoyang and Zhuang, Yuan and Qiu, Lin and Wang, Xun},  
+journal={IEEE Transactions on Knowledge and Data Engineering},   
+title={Combining Graph Neural Networks with Expert Knowledge for Smart Contract Vulnerability Detection},   
+year={2021},  
+volume={},  
+number={},  
+pages={1-1},  
+doi={10.1109/TKDE.2021.3095196}}
+``` 
 
 ## Requirements
 
