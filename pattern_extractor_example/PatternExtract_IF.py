@@ -334,6 +334,7 @@ if __name__ == "__main__":
                 label = 0
             else:
                 label = 1
+            print("Label:",label)
         else:
             print("The extracted patterns are error!")
 
