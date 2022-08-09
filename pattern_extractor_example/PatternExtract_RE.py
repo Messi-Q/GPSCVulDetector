@@ -91,7 +91,7 @@ def extract_pattern(filepath):
                     break
                 elif j + 1 == len(callValueList[i]) and len(pattern_list) == 2:
                     pattern_list.append(0)
-
+    print(pattern_list)
     return pattern_list
 
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
                 label = 0
         else:
             print("The extracted patterns are error!")
-
+        print("label:",label)
         pattern1.append(pattern_list[0])
         pattern2.append(pattern_list[1])
         pattern3.append(pattern_list[2])
