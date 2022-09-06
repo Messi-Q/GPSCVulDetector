@@ -37,11 +37,9 @@ Here, we present the dataset structure in our project, including the graph featu
 ```shell
 ${GPSCVulDetector}
 ├── data
-│   ├── loops
 │   ├── timestamp
 │   └── reentrancy
 ├── graph_feature
-│   ├── loops
 │   ├── timestamp
 │   └── reentrancy
 └── pattern_feature
