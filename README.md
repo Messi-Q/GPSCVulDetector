@@ -50,7 +50,7 @@ ${GPSCVulDetector}
 
 ## Graph extractor & Pattern extractor
 1. **Graph:** The contract graph and its feature are extracted by the automatic graph extractor 
-implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in this directory `tools`.
+implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in this directory `graph_extractor_example`.
 2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in this directory `pattern_extractor_example`.  
 
 
