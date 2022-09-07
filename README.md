@@ -36,16 +36,9 @@ Here, we present the dataset structure in our project, including the graph featu
 
 ```shell
 ${GPSCVulDetector}
-├── data
-│   ├── timestamp
-│   └── reentrancy
 ├── graph_feature
-│   ├── timestamp
-│   └── reentrancy
 └── pattern_feature
-    ├── feature_by_zeropadding
-    ├── original_pattern_feature
-    └── label_by_autoextractor
+
 ```
 
 ## Graph extractor & Pattern extractor
