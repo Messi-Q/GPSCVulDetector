@@ -39,6 +39,7 @@ implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetecto
 
 Notably, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
 
+If any question, please email to messi.qp711@gmail.com. 
 
 ## References
 1. Smart Contract Vulnerability Detection Using Graph Neural Networks. IJCAI 2020. [GNNSCVulDetector](https://github.com/Messi-Q/GNNSCVulDetector).
