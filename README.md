@@ -30,16 +30,6 @@ pip install numpy==1.18.2
 pip install scikit-learn
 ```
 
-### Dataset
-#### Dataset structure in this project
-Here, we present the dataset structure in our project, including the graph feature and pattern feature.
-
-```shell
-${GPSCVulDetector}
-├── graph_feature
-└── pattern_feature
-
-```
 
 ## Graph extractor & Pattern extractor
 1. **Graph:** The contract graph and its feature are extracted by the automatic graph extractor 
