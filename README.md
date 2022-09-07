@@ -50,16 +50,6 @@ implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetecto
 Notably, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
 
 
-## Running Project
-* To run program, use this command: python GPSCVulDetector.py.
-* Also, you can use specific hyperparameters to train the model. All the hyperparameters can be found in `parser.py`.
-
-Examples:
-```shell
-python GPSCVulDetector.py
-python GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 100 --batch_size 32
-```
-
 ## References
 1. Smart Contract Vulnerability Detection Using Graph Neural Networks. IJCAI 2020. [GNNSCVulDetector](https://github.com/Messi-Q/GNNSCVulDetector).
 ```
