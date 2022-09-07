@@ -9,7 +9,7 @@ args = parameter_parser()
 
 def main():
     graph_train, graph_test, graph_experts_train, graph_experts_test = get_graph_feature()
-    pattern_train, pattern_test, _, _ = get_pattern_feature()
+    pattern_train, pattern_test, extractor_train, extractor_test = get_pattern_feature()
 
     graph_train = np.array(graph_train)  # The training set of graph feature
     graph_test = np.array(graph_test)  # The testing set of graph feature

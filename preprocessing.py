@@ -2,15 +2,15 @@ import numpy as np
 
 
 def get_pattern_feature():
-    train_total_name_path = "./graph_feature/reentrancy/contract_name_train.txt"
-    valid_total_name_path = "./graph_feature/reentrancy/contract_name_valid.txt"
-    pattern_feature_path = "./pattern_feature/feature_by_zeropadding/reentrancy/"
+    train_total_name_path = "./graph_feature/timestamp/contract_name_train.txt"
+    valid_total_name_path = "./graph_feature/timestamp/contract_name_valid.txt"
+    pattern_feature_path = "./pattern_feature/original_pattern_feature/timestamp/"
 
     final_pattern_feature_train = []  # pattern feature train
-    pattern_feature_train_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_train.txt"
+    pattern_feature_train_label_path = "./pattern_feature/feature_by_zeropadding/timestamp/label_by_extractor_train.txt"
     
     final_pattern_feature_valid = []  # pattern feature valid
-    pattern_feature_test_label_path = "./pattern_feature/feature_by_zeropadding/reentrancy/label_by_extractor_valid.txt"
+    pattern_feature_test_label_path = "./pattern_feature/feature_by_zeropadding/timestamp/label_by_extractor_valid.txt"
 
     f_train = open(train_total_name_path, 'r')
     lines = f_train.readlines()
@@ -49,11 +49,11 @@ def get_pattern_feature():
 
 
 def get_graph_feature():
-    graph_feature_train_data_path = "./graph_feature/reentrancy/reentrancy_final_train.txt"
-    graph_feature_train_label_path = "./graph_feature/reentrancy/label_by_experts_train.txt"
+    graph_feature_train_data_path = "./graph_feature/timestamp/timestamp_train_feature.txt"
+    graph_feature_train_label_path = "./graph_feature/timestamp/label_by_experts_train.txt"
 
-    graph_feature_test_data_path = "./graph_feature/reentrancy/reentrancy_final_valid.txt"
-    graph_feature_test_label_path = "./graph_feature/reentrancy/label_by_experts_valid.txt"
+    graph_feature_test_data_path = "./graph_feature/timestamp/timestamp_valid_feature.txt"
+    graph_feature_test_label_path = "./graph_feature/timestamp/label_by_experts_valid.txt"
 
     #  labels of experts definition
     label_by_experts_train = []

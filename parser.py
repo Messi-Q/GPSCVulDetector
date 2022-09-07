@@ -10,7 +10,7 @@ def parameter_parser():
                         choices=['CGE', 'CGEVariant'])
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('-d', '--dropout', type=float, default=0.2, help='dropout rate')
-    parser.add_argument('--epochs', type=int, default=100, help='number of epochs')
-    parser.add_argument('-b', '--batch_size', type=int, default=32, help='batch size')
+    parser.add_argument('--epochs', type=int, default=50, help='number of epochs')
+    parser.add_argument('-b', '--batch_size', type=int, default=16, help='batch size')
 
     return parser.parse_args()

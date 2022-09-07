@@ -44,6 +44,9 @@ implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetecto
 2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in this directory `pattern_extractor_example`.  
 
 
+Note, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
+
+
 ## Running Project
 * To run program, use this command: python GPSCVulDetector.py.
 * Also, you can use specific hyperparameters to train the model. All the hyperparameters can be found in `parser.py`.
