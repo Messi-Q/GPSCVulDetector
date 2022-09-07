@@ -47,7 +47,7 @@ implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetecto
 2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in this directory `pattern_extractor_example`.  
 
 
-Note, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
+Notably, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
 
 
 ## Running Project
