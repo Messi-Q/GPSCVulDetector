@@ -1,6 +1,18 @@
 # GPSCVulDetector
 
-This repo is a python implementation of combining graph neural network with expert patterns for smart contract vulnerability detection. 
+This repo is a python implementation of combining graph neural network with expert knowledge for smart contract vulnerability detection. 
+
+## Citation
+Please use this citation if you want to cite our [paper](https://ieeexplore.ieee.org/abstract/document/9477066/) or codebase in your paper:
+```
+@article{liu2021combining,
+  title={Combining graph neural networks with expert knowledge for smart contract vulnerability detection},
+  author={Liu, Zhenguang and Qian, Peng and Wang, Xiaoyang and Zhuang, Yuan and Qiu, Lin and Wang, Xun},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  year={2021},
+  publisher={IEEE}
+}
+``` 
 
 ## Requirements
 
@@ -24,18 +36,9 @@ Here, we present the dataset structure in our project, including the graph featu
 
 ```shell
 ${GPSCVulDetector}
-├── data
-│   ├── loops
-│   ├── timestamp
-│   └── reentrancy
 ├── graph_feature
-│   ├── loops
-│   ├── timestamp
-│   └── reentrancy
 └── pattern_feature
-    ├── feature_by_zeropadding
-    ├── original_pattern_feature
-    └── label_by_autoextractor
+
 ```
 
 ## Graph extractor & Pattern extractor
@@ -54,7 +57,7 @@ Note, you can also use the features extracted in [AMEVulDetector](https://github
 Examples:
 ```shell
 python GPSCVulDetector.py
-python GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 50 --batch_size 32
+python GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 100 --batch_size 32
 ```
 
 ## References
