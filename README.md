@@ -3,61 +3,53 @@
 This repo is a python implementation of combining graph neural network with expert knowledge for smart contract vulnerability detection. 
 
 ## Citation
-Please use this citation if you want to cite our [paper](https://ieeexplore.ieee.org/abstract/document/9477066/) or codebase in your paper:
+Please use this citation in your paper if you refer to our [paper](https://ieeexplore.ieee.org/abstract/document/9477066/) or code.
 ```
-@article{liu2021combining,
-  title={Combining graph neural networks with expert knowledge for smart contract vulnerability detection},
+@article{liu2023combining,
+  title={Combining Graph Neural Networks With Expert Knowledge for Smart Contract Vulnerability Detection},
   author={Liu, Zhenguang and Qian, Peng and Wang, Xiaoyang and Zhuang, Yuan and Qiu, Lin and Wang, Xun},
-  journal={IEEE Transactions on Knowledge and Data Engineering},
-  year={2021},
-  publisher={IEEE}
+  journal={IEEE Transactions on Knowledge \& Data Engineering},
+  volume={35},
+  number={02},
+  pages={1296--1310},
+  year={2023},
+  publisher={IEEE Computer Society}
 }
 ``` 
 
 ## Requirements
 
 ### Required Packages
-* **python**3 or above
+* **python** 3+
 * **TensorFlow** 2.0
 * **numpy** 1.18.2
-* **sklearn** for model evaluation
+* **sklearn** 0.20.2
 
 Run the following script to install the required packages.
 ```shell
 pip install --upgrade pip
 pip install tensorflow==2.0
 pip install numpy==1.18.2
-pip install scikit-learn
+pip install scikit-learn==0.20.2
 ```
 
-### Dataset
-#### Dataset structure in this project
-Here, we present the dataset structure in our project, including the graph feature and pattern feature.
-
-```shell
-${GPSCVulDetector}
-├── graph_feature
-└── pattern_feature
-
-```
 
 ## Graph extractor & Pattern extractor
-1. **Graph:** The contract graph and its feature are extracted by the automatic graph extractor 
-implemented by our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector) and in this directory `graph_extractor_example`.
-2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in this directory `pattern_extractor_example`.  
+1. **Graph:** The contract graph and its feature are extracted by the automatic graph extractor in the `graph_extractor_example` directory (or refer to our [previous methods](https://github.com/Messi-Q/GNNSCVulDetector)).
+2. **Pattern:** The expert pattern and its feature are extracted by the automatic pattern extractor in the `pattern_extractor_example` directory.  
 
 
-Note, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
+Notably, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
 
 
 ## Running Project
-* To run program, use this command: python GPSCVulDetector.py.
-* Also, you can use specific hyperparameters to train the model. All the hyperparameters can be found in `parser.py`.
+* To run program, please use this command: python3 GPSCVulDetector.py.
+* Also, you can set specific hyperparameters, and all the hyperparameters can be found in `parser.py`.
 
 Examples:
 ```shell
-python GPSCVulDetector.py
-python GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 100 --batch_size 32
+python3 GPSCVulDetector.py
+python3 GPSCVulDetector.py --model CGE --lr 0.002 --dropout 0.2 --epochs 100 --batch_size 32
 ```
 
 ## References
