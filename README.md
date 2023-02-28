@@ -41,6 +41,8 @@ pip install scikit-learn==0.20.2
 
 Notably, you can also use the features extracted in [AMEVulDetector](https://github.com/Messi-Q/AMEVulDetector).
 
+If any question, please email to messi.qp711@gmail.com.
+
 
 ## Running Project
 * To run program, please use this command: python3 GPSCVulDetector.py.
